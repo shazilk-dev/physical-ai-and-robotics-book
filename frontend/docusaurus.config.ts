@@ -15,7 +15,9 @@ const config: Config = {
   },
 
   // Set the production url of your site here
-  url: process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://shazilk-dev.github.io",
+  url: process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "https://shazilk-dev.github.io",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For Vercel, use "/" (root). For GitHub Pages, use "/<projectName>/"
   baseUrl: process.env.VERCEL ? "/" : "/physical-ai-and-robotics-book/",
