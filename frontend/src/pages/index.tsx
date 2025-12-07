@@ -21,7 +21,7 @@ function HeroSection() {
           <div className={styles.heroButtons}>
             <Link
               className={styles.primaryButton}
-              to="/docs/chapters/chapter-01-foundations"
+              to="/docs/intro"
             >
               Start Reading →
             </Link>
