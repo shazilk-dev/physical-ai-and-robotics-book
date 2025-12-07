@@ -1,0 +1,61 @@
+{
+  "questions": [
+    {
+      "id": "background_level",
+      "type": "select",
+      "question": "What is your experience level with robotics?",
+      "required": true,
+      "options": [
+        { "value": "beginner", "label": "Beginner - New to robotics" },
+        {
+          "value": "intermediate",
+          "label": "Intermediate - Some robotics experience"
+        },
+        { "value": "advanced", "label": "Advanced - Professional/researcher" }
+      ]
+    },
+    {
+      "id": "has_ros_experience",
+      "type": "boolean",
+      "question": "Have you used ROS (Robot Operating System) before?",
+      "required": true
+    },
+    {
+      "id": "has_robotics_experience",
+      "type": "boolean",
+      "question": "Have you built or programmed robots before?",
+      "required": true
+    },
+    {
+      "id": "has_ai_experience",
+      "type": "boolean",
+      "question": "Do you have experience with AI/Machine Learning?",
+      "required": true
+    },
+    {
+      "id": "programming_languages",
+      "type": "multiselect",
+      "question": "Which programming languages are you comfortable with?",
+      "required": false,
+      "options": [
+        { "value": "python", "label": "Python" },
+        { "value": "cpp", "label": "C++" },
+        { "value": "javascript", "label": "JavaScript/TypeScript" },
+        { "value": "java", "label": "Java" },
+        { "value": "other", "label": "Other" }
+      ]
+    },
+    {
+      "id": "learning_goal",
+      "type": "select",
+      "question": "What's your primary goal for using this textbook?",
+      "required": false,
+      "options": [
+        { "value": "academic", "label": "Academic study" },
+        { "value": "career", "label": "Career transition" },
+        { "value": "hobby", "label": "Personal hobby/interest" },
+        { "value": "research", "label": "Research project" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,449 @@
+openapi: 3.1.0
+
+info:
+  title: Physical AI Book - RAG Chatbot API
+  description: |
+    RESTful API for the RAG (Retrieval-Augmented Generation) chatbot powering the Physical AI & Humanoid Robotics educational book.
+
+    **Features:**
+    - Semantic search over book content using OpenAI embeddings
+    - Context-aware question answering with source citations
+    - Answer questions about selected text passages
+    - Sub-3-second response times (95th percentile)
+
+    **Architecture:**
+    - Backend: FastAPI 0.115+ (Python 3.11+)
+    - Vector DB: Qdrant Cloud (1GB free tier)
+    - Models: text-embedding-3-small, gpt-4o-mini
+    - Deployment: Render free tier
+  version: 1.0.0
+  contact:
+    name: Physical AI Book Project
+  license:
+    name: MIT
+
+servers:
+  - url: https://physical-ai-api.onrender.com
+    description: Production server (Render)
+  - url: http://localhost:8000
+    description: Local development server
+
+tags:
+  - name: rag
+    description: RAG query endpoints
+  - name: health
+    description: Health check endpoints
+
+paths:
+  /api/v1/query:
+    post:
+      tags:
+        - rag
+      summary: Query the RAG chatbot
+      description: |
+        Submits a natural language question to the chatbot. The system:
+        1. Embeds the question using text-embedding-3-small
+        2. Retrieves relevant document chunks from Qdrant (top 5 by cosine similarity)
+        3. Generates a response using gpt-4o-mini with retrieved context
+        4. Returns the answer with source citations (chapter/section references)
+
+        **Performance Target:** <3s response time (95th percentile)
+      operationId: queryRAG
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RAGQueryRequest"
+            examples:
+              basic_question:
+                summary: Basic concept question
+                value:
+                  query: "What is Physical AI and how does it differ from digital AI?"
+              technical_question:
+                summary: Technical implementation question
+                value:
+                  query: "How do humanoid robots achieve real-time balance control?"
+      responses:
+        "200":
+          description: Successful response with answer and citations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RAGQueryResponse"
+              examples:
+                successful_response:
+                  summary: Typical successful response
+                  value:
+                    response_id: "resp-550e8400-e29b-41d4-a716-446655440000"
+                    query_id: "query-123e4567-e89b-12d3-a456-426614174000"
+                    answer: "Physical AI is the synthesis of artificial intelligence (machine learning, computer vision, natural language processing) with physical hardware (robots, sensors, actuators) that enables interaction with and adaptation to the real world. Unlike digital AI which processes information in virtual environments, Physical AI manipulates matter and operates in physical space."
+                    sources:
+                      - chapter: 1
+                        section: "1.1"
+                        section_title: "What is Physical AI?"
+                        page_range: "1-2"
+                    processing_time_ms: 1850
+                    timestamp: "2025-12-07T14:22:37Z"
+        "400":
+          description: Invalid request (empty query, malformed JSON)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                empty_query:
+                  summary: Empty query string
+                  value:
+                    error: "Validation Error"
+                    message: "query field must not be empty"
+                    details:
+                      - field: "query"
+                        issue: "String must contain at least 5 characters"
+        "500":
+          description: Internal server error (OpenAI API failure, Qdrant unavailable)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                openai_timeout:
+                  summary: OpenAI API timeout
+                  value:
+                    error: "Internal Server Error"
+                    message: "OpenAI API request timed out after 10s"
+                    details: []
+        "503":
+          description: Service unavailable (rate limit exceeded, maintenance mode)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                rate_limit:
+                  summary: Rate limit exceeded
+                  value:
+                    error: "Service Unavailable"
+                    message: "Rate limit exceeded. Try again in 60 seconds."
+                    details: []
+
+  /api/v1/query-selection:
+    post:
+      tags:
+        - rag
+      summary: Answer question about selected text
+      description: |
+        Answers a question scoped to a specific text passage that the user has highlighted.
+        This mode:
+        1. Uses the provided `selected_text` as primary context (no vector search)
+        2. Falls back to semantic search if the selection doesn't contain enough context
+        3. Generates a response focused on the highlighted passage
+
+        **Use Case:** User highlights "embodied intelligence" in Chapter 1 and asks "What does this mean?"
+      operationId: querySelection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RAGSelectionQueryRequest"
+            examples:
+              selection_question:
+                summary: Question about selected text
+                value:
+                  query: "What does this term mean in the context of robotics?"
+                  selected_text: "Embodied intelligence—intelligence that emerges from the interaction between body, brain, and environment."
+      responses:
+        "200":
+          description: Successful response with answer scoped to selection
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RAGQueryResponse"
+              examples:
+                selection_response:
+                  summary: Response focused on selected text
+                  value:
+                    response_id: "resp-660e9500-f39c-52e5-b827-557766551111"
+                    query_id: "query-234f5678-f90c-23e4-b567-537725285111"
+                    answer: "In robotics, embodied intelligence refers to the principle that intelligence is not solely a computational process in the 'brain' (computer), but emerges from the physical interaction between the robot's body (sensors, actuators), its control system (algorithms), and the environment it operates in. This contrasts with traditional AI which treats intelligence as purely abstract symbol manipulation."
+                    sources:
+                      - chapter: 1
+                        section: "1.1"
+                        section_title: "What is Physical AI?"
+                        page_range: "1-2"
+                    processing_time_ms: 1200
+                    timestamp: "2025-12-07T15:10:22Z"
+        "400":
+          description: Invalid request (empty query or selection)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /health:
+    get:
+      tags:
+        - health
+      summary: Health check endpoint
+      description: |
+        Returns the health status of the API and its dependencies:
+        - API server (FastAPI)
+        - OpenAI API connectivity
+        - Qdrant vector database connectivity
+
+        Used by monitoring systems and load balancers.
+      operationId: healthCheck
+      responses:
+        "200":
+          description: All systems operational
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthCheckResponse"
+              examples:
+                healthy:
+                  summary: All services healthy
+                  value:
+                    status: "healthy"
+                    timestamp: "2025-12-07T14:30:00Z"
+                    services:
+                      api: "healthy"
+                      openai: "healthy"
+                      qdrant: "healthy"
+                    version: "1.0.0"
+        "503":
+          description: One or more services unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthCheckResponse"
+              examples:
+                qdrant_down:
+                  summary: Qdrant unreachable
+                  value:
+                    status: "unhealthy"
+                    timestamp: "2025-12-07T14:30:00Z"
+                    services:
+                      api: "healthy"
+                      openai: "healthy"
+                      qdrant: "unhealthy"
+                    version: "1.0.0"
+
+components:
+  schemas:
+    RAGQueryRequest:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: string
+          minLength: 5
+          maxLength: 500
+          description: Natural language question about book content
+          example: "What is Physical AI and how does it differ from digital AI?"
+      additionalProperties: false
+
+    RAGSelectionQueryRequest:
+      type: object
+      required:
+        - query
+        - selected_text
+      properties:
+        query:
+          type: string
+          minLength: 5
+          maxLength: 500
+          description: Question about the selected text
+          example: "What does this term mean?"
+        selected_text:
+          type: string
+          minLength: 10
+          maxLength: 2000
+          description: Text passage highlighted by the user
+          example: "Embodied intelligence—intelligence that emerges from the interaction between body, brain, and environment."
+      additionalProperties: false
+
+    RAGQueryResponse:
+      type: object
+      required:
+        - response_id
+        - query_id
+        - answer
+        - sources
+        - processing_time_ms
+        - timestamp
+      properties:
+        response_id:
+          type: string
+          format: uuid
+          description: Unique identifier for this response
+          example: "resp-550e8400-e29b-41d4-a716-446655440000"
+        query_id:
+          type: string
+          format: uuid
+          description: Identifier of the original query
+          example: "query-123e4567-e89b-12d3-a456-426614174000"
+        answer:
+          type: string
+          minLength: 50
+          maxLength: 1000
+          description: Generated answer based on retrieved context
+          example: "Physical AI is the synthesis of artificial intelligence with physical hardware that enables interaction with and adaptation to the real world."
+        sources:
+          type: array
+          minItems: 1
+          maxItems: 5
+          description: Chapter/section citations for source traceability
+          items:
+            $ref: "#/components/schemas/SourceCitation"
+        processing_time_ms:
+          type: integer
+          minimum: 0
+          maximum: 10000
+          description: Time taken to generate response (milliseconds)
+          example: 1850
+        timestamp:
+          type: string
+          format: date-time
+          description: When the response was generated (ISO 8601)
+          example: "2025-12-07T14:22:37Z"
+      additionalProperties: false
+
+    SourceCitation:
+      type: object
+      required:
+        - chapter
+        - section
+        - section_title
+        - page_range
+      properties:
+        chapter:
+          type: integer
+          minimum: 1
+          maximum: 10
+          description: Chapter number (1-10)
+          example: 1
+        section:
+          type: string
+          pattern: '^\d+\.\d+$'
+          description: Section identifier (e.g., "1.1", "3.2")
+          example: "1.1"
+        section_title:
+          type: string
+          minLength: 3
+          maxLength: 100
+          description: Human-readable section title
+          example: "What is Physical AI?"
+        page_range:
+          type: string
+          pattern: '^\d+-\d+$'
+          description: Page numbers in the book (e.g., "1-2")
+          example: "1-2"
+      additionalProperties: false
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+        - details
+      properties:
+        error:
+          type: string
+          description: Error category (Validation Error, Internal Server Error, etc.)
+          example: "Validation Error"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "query field must not be empty"
+        details:
+          type: array
+          description: Additional error details (field-level validation errors)
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                example: "query"
+              issue:
+                type: string
+                example: "String must contain at least 5 characters"
+      additionalProperties: false
+
+    HealthCheckResponse:
+      type: object
+      required:
+        - status
+        - timestamp
+        - services
+        - version
+      properties:
+        status:
+          type: string
+          enum:
+            - healthy
+            - unhealthy
+          description: Overall health status
+          example: "healthy"
+        timestamp:
+          type: string
+          format: date-time
+          description: When health check was performed
+          example: "2025-12-07T14:30:00Z"
+        services:
+          type: object
+          required:
+            - api
+            - openai
+            - qdrant
+          properties:
+            api:
+              type: string
+              enum:
+                - healthy
+                - unhealthy
+              description: FastAPI server status
+              example: "healthy"
+            openai:
+              type: string
+              enum:
+                - healthy
+                - unhealthy
+              description: OpenAI API connectivity status
+              example: "healthy"
+            qdrant:
+              type: string
+              enum:
+                - healthy
+                - unhealthy
+              description: Qdrant vector database connectivity status
+              example: "healthy"
+        version:
+          type: string
+          pattern: '^\d+\.\d+\.\d+$'
+          description: API version (semantic versioning)
+          example: "1.0.0"
+      additionalProperties: false
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: |
+        Optional API key for rate limiting and access control.
+        Not required for public book chatbot, but may be enabled for premium features.
+
+security: [] # No authentication required for public endpoints
+
+externalDocs:
+  description: Full project specification
+  url: https://github.com/your-org/physical-ai-book/blob/main/specs/001-physical-ai-book/spec.md

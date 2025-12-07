@@ -1,0 +1,7 @@
+[INFO] [1733587200.123456789] [heartbeat_publisher]: ✅ Heartbeat node started - publishing to /robot/ready at 1Hz
+[INFO] [1733587201.123456789] [heartbeat_publisher]: Published: READY: Heartbeat #0 at 2025-12-07T10:30:00.123456
+[INFO] [1733587202.123456789] [heartbeat_publisher]: Published: READY: Heartbeat #1 at 2025-12-07T10:30:01.123456
+[INFO] [1733587203.123456789] [heartbeat_publisher]: Published: READY: Heartbeat #2 at 2025-12-07T10:30:02.123456
+[INFO] [1733587204.123456789] [heartbeat_publisher]: Published: READY: Heartbeat #3 at 2025-12-07T10:30:03.123456
+[INFO] [1733587205.123456789] [heartbeat_publisher]: Published: READY: Heartbeat #4 at 2025-12-07T10:30:04.123456
+[INFO] [1733587206.123456789] [heartbeat_publisher]: Published: READY: Heartbeat #5 at 2025-12-07T10:30:05.123456
