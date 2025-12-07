@@ -33,7 +33,8 @@ interface Message {
 
 const API_URL =
   process.env.NODE_ENV === "production"
-    ? "https://your-api-domain.com/api/v1"
+    ? process.env.NEXT_PUBLIC_API_URL ||
+      "https://your-backend.up.railway.app/api/v1"
     : "http://localhost:8000/api/v1";
 
 export default function ChatWidget(): JSX.Element {
