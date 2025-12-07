@@ -37,7 +37,7 @@ const API_URL =
       "https://your-backend.up.railway.app/api/v1"
     : "http://localhost:8000/api/v1";
 
-export default function ChatWidget(): JSX.Element {
+export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
