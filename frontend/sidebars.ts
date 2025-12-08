@@ -32,6 +32,11 @@ const sidebars: SidebarsConfig = {
           items: [
             "module-01-ros2/ros2-fundamentals/1.1.1-architecture",
             "module-01-ros2/ros2-fundamentals/1.1.2-rclpy-patterns",
+            {
+              type: "link",
+              label: "🔬 Lab 1: First ROS 2 Node",
+              href: "/docs/labs/lab01-ros2-basics",
+            },
             "module-01-ros2/ros2-fundamentals/1.1.3-parameters-launch",
             "module-01-ros2/ros2-fundamentals/1.1.4-qos-realtime",
           ],
@@ -48,21 +53,23 @@ const sidebars: SidebarsConfig = {
         },
       ],
     },
+
+    // Dedicated Labs Section
+    {
+      type: "category",
+      label: "🔬 Labs & Exercises",
+      collapsed: true,
+      items: ["labs/overview", "labs/lab01-ros2-basics"],
+    },
   ],
 
-  // Labs sidebar - separate from main content
+  // Labs sidebar - for standalone labs view (optional)
   labsSidebar: [
     {
       type: "category",
       label: "Labs",
       collapsed: false,
-      items: [
-        {
-          type: "link",
-          label: "Lab 1: ROS 2 Basics",
-          href: "/labs/lab01-ros2-basics/README",
-        },
-      ],
+      items: ["labs/overview", "labs/lab01-ros2-basics"],
     },
   ],
 };

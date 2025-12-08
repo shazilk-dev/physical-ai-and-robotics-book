@@ -1,19 +1,9 @@
 /**
- * ChatWidget Component - Modernized Professional UI
- * RAG-powered Q&A interface with Lucide icons
+ * ChatWidget Component
+ * Floating chat button that expands into a RAG-powered Q&A interface
  */
 
 import React, { useState, useRef, useEffect } from "react";
-import {
-  MessageCircle,
-  X,
-  Send,
-  Bot,
-  User,
-  BookOpen,
-  AlertCircle,
-  Loader2,
-} from "lucide-react";
 import styles from "./ChatWidget.module.css";
 
 interface Source {
@@ -53,7 +43,7 @@ export default function ChatWidget() {
     {
       type: "assistant",
       content:
-        "Hi! I'm your Physical AI learning assistant. Ask me anything about ROS 2, URDF, sensors, or robotics concepts from the book.",
+        "👋 Hi! I'm your Physical AI learning assistant. Ask me anything about ROS 2, URDF, sensors, or robotics!",
       timestamp: new Date(),
     },
   ]);
@@ -121,7 +111,7 @@ export default function ChatWidget() {
 
       const errorMessage: Message = {
         type: "error",
-        content: `Sorry, I couldn't process your question. ${error.message}. Make sure the backend server is running.`,
+        content: `⚠️ Sorry, I couldn't process your question. ${error.message}. Make sure the backend server is running.`,
         timestamp: new Date(),
       };
 
@@ -132,11 +122,16 @@ export default function ChatWidget() {
   };
 
   const scrollToSection = (filePath: string, section: string) => {
+    // Convert file path to URL
+    // Example: "frontend/docs/module-01-ros2/ros2-fundamentals/1.1.1-architecture.md"
+    // -> "/docs/module-01-ros2/ros2-fundamentals/1.1.1-architecture"
+
     const docPath = filePath
       .replace("frontend/docs/", "/docs/")
       .replace(".md", "")
       .replace(/\\/g, "/");
 
+    // Navigate to the page
     window.location.href = docPath;
   };
 
@@ -152,25 +147,14 @@ export default function ChatWidget() {
         } ${isError ? styles.errorMessage : ""}`}
       >
         <div className={styles.messageContent}>
-          {!isUser && (
-            <div className={styles.avatarWrapper}>
-              {isError ? (
-                <AlertCircle className={styles.avatarIcon} size={20} />
-              ) : (
-                <Bot className={styles.avatarIcon} size={20} />
-              )}
-            </div>
-          )}
+          {!isUser && <div className={styles.avatar}>🤖</div>}
 
           <div className={styles.messageBody}>
             <div className={styles.messageText}>{message.content}</div>
 
             {message.citations && message.citations.length > 0 && (
               <div className={styles.citations}>
-                <div className={styles.citationsLabel}>
-                  <BookOpen size={14} />
-                  <span>Sources</span>
-                </div>
+                <div className={styles.citationsLabel}>📚 Sources:</div>
                 <div className={styles.citationsList}>
                   {message.citations.map((citation, i) => {
                     const source = message.sources?.[i];
@@ -181,9 +165,9 @@ export default function ChatWidget() {
                         onClick={() =>
                           source && scrollToSection(source.file_path, citation)
                         }
-                        title={`Open ${citation} (relevance: ${(
-                          (source?.score || 0) * 100
-                        ).toFixed(0)}%)`}
+                        title={`Open ${citation} (score: ${source?.score.toFixed(
+                          2
+                        )})`}
                       >
                         {citation}
                       </button>
@@ -194,11 +178,7 @@ export default function ChatWidget() {
             )}
           </div>
 
-          {isUser && (
-            <div className={styles.avatarWrapper}>
-              <User className={styles.avatarIcon} size={20} />
-            </div>
-          )}
+          {isUser && <div className={styles.avatar}>👤</div>}
         </div>
       </div>
     );
@@ -212,11 +192,7 @@ export default function ChatWidget() {
         onClick={() => setIsOpen(!isOpen)}
         aria-label={isOpen ? "Close chat" : "Open chat"}
       >
-        {isOpen ? (
-          <X size={24} strokeWidth={2.5} />
-        ) : (
-          <MessageCircle size={24} strokeWidth={2.5} />
-        )}
+        {isOpen ? "✕" : "💬"}
       </button>
 
       {/* Chat Panel */}
@@ -224,18 +200,15 @@ export default function ChatWidget() {
         <div className={styles.chatPanel}>
           <div className={styles.chatHeader}>
             <div className={styles.headerTitle}>
-              <Bot size={24} strokeWidth={2} />
-              <div>
-                <div className={styles.headerTitleText}>AI Assistant</div>
-                <div className={styles.headerSubtitle}>Physical AI Book</div>
-              </div>
+              <span className={styles.headerIcon}>🤖</span>
+              <span>AI Learning Assistant</span>
             </div>
             <button
               className={styles.closeButton}
               onClick={() => setIsOpen(false)}
               aria-label="Close chat"
             >
-              <X size={20} />
+              ✕
             </button>
           </div>
 
@@ -245,12 +218,7 @@ export default function ChatWidget() {
             {isLoading && (
               <div className={`${styles.message} ${styles.assistantMessage}`}>
                 <div className={styles.messageContent}>
-                  <div className={styles.avatarWrapper}>
-                    <Loader2
-                      className={`${styles.avatarIcon} ${styles.spinning}`}
-                      size={20}
-                    />
-                  </div>
+                  <div className={styles.avatar}>🤖</div>
                   <div className={styles.messageBody}>
                     <div className={styles.loadingDots}>
                       <span></span>
@@ -281,7 +249,7 @@ export default function ChatWidget() {
               disabled={isLoading || !inputValue.trim()}
               aria-label="Send message"
             >
-              <Send size={18} />
+              {isLoading ? "⏳" : "📤"}
             </button>
           </form>
 

@@ -2,21 +2,6 @@ import React from "react";
 import Link from "@docusaurus/Link";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import Layout from "@theme/Layout";
-import {
-  Bot,
-  Book,
-  Cpu,
-  Eye,
-  Brain,
-  Factory,
-  Sparkles,
-  GraduationCap,
-  Code,
-  FlaskConical,
-  Building2,
-  ArrowRight,
-  Check,
-} from "lucide-react";
 import styles from "./index.module.css";
 
 function HeroSection() {
@@ -35,7 +20,7 @@ function HeroSection() {
           </p>
           <div className={styles.heroButtons}>
             <Link className={styles.primaryButton} to="/docs/intro">
-              Start Reading <ArrowRight className={styles.buttonIcon} />
+              Start Reading →
             </Link>
             <Link
               className={styles.secondaryButton}
@@ -46,10 +31,74 @@ function HeroSection() {
           </div>
         </div>
         <div className={styles.heroVisual}>
-          <div className={styles.iconGrid}>
-            <Bot className={styles.floatingIcon} size={64} strokeWidth={1.5} />
-            <Cpu className={styles.floatingIcon} size={48} strokeWidth={1.5} />
-            <Brain className={styles.floatingIcon} size={56} strokeWidth={1.5} />
+          <div className={styles.robotIcon}>
+            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+              {/* Robot Head */}
+              <rect
+                x="70"
+                y="40"
+                width="60"
+                height="50"
+                rx="8"
+                fill="#4a90e2"
+              />
+              {/* Eyes */}
+              <circle cx="85" cy="60" r="6" fill="#fff" />
+              <circle cx="115" cy="60" r="6" fill="#fff" />
+              {/* Antenna */}
+              <line
+                x1="100"
+                y1="40"
+                x2="100"
+                y2="25"
+                stroke="#4a90e2"
+                strokeWidth="3"
+              />
+              <circle cx="100" cy="22" r="5" fill="#7b68ee" />
+              {/* Body */}
+              <rect
+                x="65"
+                y="90"
+                width="70"
+                height="60"
+                rx="10"
+                fill="#5a9fd8"
+              />
+              {/* Arms */}
+              <rect
+                x="40"
+                y="100"
+                width="25"
+                height="40"
+                rx="8"
+                fill="#4a90e2"
+              />
+              <rect
+                x="135"
+                y="100"
+                width="25"
+                height="40"
+                rx="8"
+                fill="#4a90e2"
+              />
+              {/* Legs */}
+              <rect
+                x="75"
+                y="150"
+                width="20"
+                height="35"
+                rx="6"
+                fill="#4a90e2"
+              />
+              <rect
+                x="105"
+                y="150"
+                width="20"
+                height="35"
+                rx="6"
+                fill="#4a90e2"
+              />
+            </svg>
           </div>
         </div>
       </div>
@@ -71,17 +120,15 @@ function HeroSection() {
   );
 }
 
-function FeatureCard({ icon: Icon, title, description, link }) {
+function FeatureCard({ icon, title, description, link }) {
   return (
     <div className={styles.featureCard}>
-      <div className={styles.featureIconWrapper}>
-        <Icon className={styles.featureIcon} size={32} strokeWidth={1.5} />
-      </div>
+      <div className={styles.featureIcon}>{icon}</div>
       <h3 className={styles.featureTitle}>{title}</h3>
       <p className={styles.featureDescription}>{description}</p>
       {link && (
         <Link className={styles.featureLink} to={link}>
-          Learn more <ArrowRight className={styles.linkIcon} size={16} />
+          Learn more →
         </Link>
       )}
     </div>
@@ -91,42 +138,42 @@ function FeatureCard({ icon: Icon, title, description, link }) {
 function FeaturesSection() {
   const features = [
     {
-      icon: Bot,
+      icon: "🤖",
       title: "Physical AI Fundamentals",
       description:
         "Understand embodied intelligence, the three eras of robotics, and the 2025 market inflection point driving humanoid adoption.",
       link: "/docs/chapters/chapter-01-foundations",
     },
     {
-      icon: Cpu,
+      icon: "⚙️",
       title: "Mechanical Design",
       description:
         "Master kinematics, inverse kinematics, actuation technologies (electric, hydraulic, QDD), and structural engineering principles.",
       link: "/docs/chapters/chapter-02-kinematics-actuation",
     },
     {
-      icon: Eye,
+      icon: "👁️",
       title: "Edge Compute & Perception",
       description:
         "Explore real-time sensor fusion, NVIDIA Jetson Thor architecture, and perception pipelines for autonomous operation.",
       link: "#",
     },
     {
-      icon: Brain,
+      icon: "🧠",
       title: "Generative AI & Learning",
       description:
         "Deep dive into Vision-Language-Action models, reinforcement learning, imitation learning, and behavior models.",
       link: "#",
     },
     {
-      icon: Factory,
+      icon: "🏭",
       title: "Real-World Deployment",
       description:
         "Production case studies from Tesla, Figure AI, Boston Dynamics, and analysis of commercial applications.",
       link: "#",
     },
     {
-      icon: Sparkles,
+      icon: "🔮",
       title: "Future Directions",
       description:
         "Explore ethics, safety standards, economic impacts, and the path to human-level dexterity and intelligence.",
@@ -160,7 +207,7 @@ function BookStructure() {
         "Chapter 1: Foundations of Physical AI",
         "Chapter 2: Kinematics & Actuation",
       ],
-      color: "#3B82F6",
+      color: "#4a90e2",
     },
     {
       title: "Part II: Intelligence Systems",
@@ -170,7 +217,7 @@ function BookStructure() {
         "Chapter 5: Planning & Navigation",
         "Chapter 6: Generative AI & Learning",
       ],
-      color: "#8B5CF6",
+      color: "#7b68ee",
     },
     {
       title: "Part III: Applications & Future",
@@ -180,7 +227,7 @@ function BookStructure() {
         "Chapter 9: Ethics & Safety",
         "Chapter 10: Future of Physical AI",
       ],
-      color: "#10B981",
+      color: "#50c878",
     },
   ];
 
@@ -202,7 +249,6 @@ function BookStructure() {
               <ul className={styles.chapterList}>
                 {part.chapters.map((chapter, chIdx) => (
                   <li key={chIdx} className={styles.chapterItem}>
-                    <Check className={styles.checkIcon} size={16} />
                     {chapter}
                   </li>
                 ))}
@@ -218,22 +264,22 @@ function BookStructure() {
 function AudienceSection() {
   const audiences = [
     {
-      icon: GraduationCap,
+      icon: "🎓",
       label: "Engineering Students",
       description: "Perfect for robotics and AI coursework",
     },
     {
-      icon: Code,
+      icon: "💻",
       label: "Software Developers",
       description: "Transition into robotics development",
     },
     {
-      icon: FlaskConical,
+      icon: "🔬",
       label: "Researchers",
       description: "Reference for physical AI systems",
     },
     {
-      icon: Building2,
+      icon: "🏢",
       label: "Industry Professionals",
       description: "Building humanoid platforms",
     },
@@ -244,18 +290,15 @@ function AudienceSection() {
       <div className={styles.container}>
         <h2 className={styles.sectionTitle}>Who This Book Is For</h2>
         <div className={styles.audienceGrid}>
-          {audiences.map((audience, idx) => {
-            const Icon = audience.icon;
-            return (
-              <div key={idx} className={styles.audienceCard}>
-                <Icon className={styles.audienceIcon} size={40} strokeWidth={1.5} />
-                <h4 className={styles.audienceLabel}>{audience.label}</h4>
-                <p className={styles.audienceDescription}>
-                  {audience.description}
-                </p>
-              </div>
-            );
-          })}
+          {audiences.map((audience, idx) => (
+            <div key={idx} className={styles.audienceCard}>
+              <div className={styles.audienceIcon}>{audience.icon}</div>
+              <h4 className={styles.audienceLabel}>{audience.label}</h4>
+              <p className={styles.audienceDescription}>
+                {audience.description}
+              </p>
+            </div>
+          ))}
         </div>
         <div className={styles.prerequisites}>
           <p>
@@ -282,7 +325,7 @@ function CTASection() {
             className={styles.ctaPrimaryButton}
             to="/docs/chapters/chapter-01-foundations"
           >
-            Begin Chapter 1 <ArrowRight className={styles.buttonIcon} />
+            Begin Chapter 1 →
           </Link>
           <Link className={styles.ctaSecondaryButton} to="/docs/intro">
             Browse All Chapters
