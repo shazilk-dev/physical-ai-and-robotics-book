@@ -38,6 +38,9 @@ export default function MultipleChoice({
 
   // Load previous progress from localStorage
   useEffect(() => {
+    // Guard against SSR
+    if (typeof window === "undefined") return;
+
     const savedProgress = localStorage.getItem("physicalai_quiz_progress");
     if (savedProgress) {
       try {

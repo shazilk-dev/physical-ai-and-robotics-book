@@ -29,6 +29,12 @@ const config: Config = {
 
   onBrokenLinks: "throw",
 
+  // Don't generate static files for API routes
+  onDuplicateRoutes: "warn",
+
+  // Exclude API routes from SSG
+  staticDirectories: ["static"],
+
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
   // may want to replace "en" with "zh-Hans".
@@ -61,6 +67,8 @@ const config: Config = {
       } satisfies Preset.Options,
     ],
   ],
+
+  plugins: ["./plugins/webpack-config.js"],
 
   themeConfig: {
     // Replace with your project's social card

@@ -19,11 +19,15 @@
     "@docusaurus/preset-classic": "3.9.2",
     "@docusaurus/theme-mermaid": "^3.9.2",
     "@mdx-js/react": "^3.0.0",
+    "@neondatabase/serverless": "^1.0.2",
+    "better-auth": "^1.4.5",
     "clsx": "^2.0.0",
+    "kysely": "^0.28.8",
     "lucide-react": "^0.556.0",
     "prism-react-renderer": "^2.3.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "ws": "^7.5.10"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "3.9.2",

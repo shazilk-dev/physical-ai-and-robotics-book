@@ -13,42 +13,42 @@ import type { SidebarsConfig } from "@docusaurus/plugin-content-docs";
  Create as many sidebars as you want.
  */
 const sidebars: SidebarsConfig = {
-  // Main book sidebar - module-based structure
+  // Main book sidebar - clear, linear structure
   bookSidebar: [
     {
       type: "doc",
       id: "intro",
-      label: "Introduction",
+      label: "Getting Started",
     },
     {
       type: "category",
-      label: "Module 1: ROS 2 Nervous System",
+      label: "Module 1: ROS 2 Fundamentals",
       collapsed: false,
+      link: {
+        type: "doc",
+        id: "module-01-ros2/overview",
+      },
       items: [
-        "module-01-ros2/overview",
         {
           type: "category",
-          label: "1.1 ROS 2 Fundamentals",
+          label: "ROS 2 Core Concepts",
+          collapsed: false,
           items: [
             "module-01-ros2/ros2-fundamentals/1.1.1-architecture",
             "module-01-ros2/ros2-fundamentals/1.1.2-rclpy-patterns",
-            {
-              type: "link",
-              label: "🔬 Lab 1: First ROS 2 Node",
-              href: "/docs/labs/lab01-ros2-basics",
-            },
             "module-01-ros2/ros2-fundamentals/1.1.3-parameters-launch",
             "module-01-ros2/ros2-fundamentals/1.1.4-qos-realtime",
           ],
         },
         {
           type: "category",
-          label: "1.2 URDF & Robot Description",
+          label: "Robot Description",
+          collapsed: true,
           items: [
-            "module-01-ros2/urdf-robot-description/1.2.1-urdf-basics",
-            "module-01-ros2/urdf-robot-description/1.2.2-sensors-urdf",
-            "module-01-ros2/urdf-robot-description/1.2.3-validating-kinematics",
-            "module-01-ros2/urdf-robot-description/1.2.4-package-testing",
+            "module-01-ros2/urdf-robot-description/urdf-basics",
+            "module-01-ros2/urdf-robot-description/sensors-urdf",
+            "module-01-ros2/urdf-robot-description/validating-kinematics",
+            "module-01-ros2/urdf-robot-description/package-testing",
           ],
         },
       ],
@@ -57,9 +57,13 @@ const sidebars: SidebarsConfig = {
     // Dedicated Labs Section
     {
       type: "category",
-      label: "🔬 Labs & Exercises",
+      label: "Hands-On Labs",
       collapsed: true,
-      items: ["labs/overview", "labs/lab01-ros2-basics"],
+      link: {
+        type: "doc",
+        id: "labs/overview",
+      },
+      items: ["labs/lab01-ros2-basics"],
     },
   ],
 
@@ -67,7 +71,7 @@ const sidebars: SidebarsConfig = {
   labsSidebar: [
     {
       type: "category",
-      label: "Labs",
+      label: "Laboratory Exercises",
       collapsed: false,
       items: ["labs/overview", "labs/lab01-ros2-basics"],
     },

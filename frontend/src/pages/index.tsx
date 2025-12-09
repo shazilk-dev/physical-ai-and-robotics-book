@@ -49,22 +49,26 @@ function HeroSection() {
           <div className={styles.iconGrid}>
             <Bot className={styles.floatingIcon} size={64} strokeWidth={1.5} />
             <Cpu className={styles.floatingIcon} size={48} strokeWidth={1.5} />
-            <Brain className={styles.floatingIcon} size={56} strokeWidth={1.5} />
+            <Brain
+              className={styles.floatingIcon}
+              size={56}
+              strokeWidth={1.5}
+            />
           </div>
         </div>
       </div>
       <div className={styles.heroStats}>
         <div className={styles.stat}>
-          <div className={styles.statNumber}>10</div>
-          <div className={styles.statLabel}>Chapters</div>
+          <div className={styles.statNumber}>4</div>
+          <div className={styles.statLabel}>Modules</div>
+        </div>
+        <div className={styles.stat}>
+          <div className={styles.statNumber}>6+</div>
+          <div className={styles.statLabel}>Labs</div>
         </div>
         <div className={styles.stat}>
           <div className={styles.statNumber}>2025</div>
-          <div className={styles.statLabel}>Latest Updates</div>
-        </div>
-        <div className={styles.stat}>
-          <div className={styles.statNumber}>100+</div>
-          <div className={styles.statLabel}>Code Examples</div>
+          <div className={styles.statLabel}>Industry Focus</div>
         </div>
       </div>
     </header>
@@ -92,45 +96,45 @@ function FeaturesSection() {
   const features = [
     {
       icon: Bot,
-      title: "Physical AI Fundamentals",
+      title: "ROS 2 Fundamentals",
       description:
-        "Understand embodied intelligence, the three eras of robotics, and the 2025 market inflection point driving humanoid adoption.",
-      link: "/docs/chapters/chapter-01-foundations",
+        "Learn the robotic nervous system: ROS 2 architecture, nodes, topics, services, and real-time communication patterns.",
+      link: "/docs/module-01-ros2/overview",
     },
     {
       icon: Cpu,
-      title: "Mechanical Design",
+      title: "URDF & Robot Description",
       description:
-        "Master kinematics, inverse kinematics, actuation technologies (electric, hydraulic, QDD), and structural engineering principles.",
-      link: "/docs/chapters/chapter-02-kinematics-actuation",
+        "Master robot modeling with URDF/Xacro, sensor integration, kinematic validation, and robot description best practices.",
+      link: "/docs/module-01-ros2/urdf-robot-description/urdf-basics",
     },
     {
       icon: Eye,
-      title: "Edge Compute & Perception",
+      title: "Sensors & Perception",
       description:
-        "Explore real-time sensor fusion, NVIDIA Jetson Thor architecture, and perception pipelines for autonomous operation.",
-      link: "#",
+        "Learn sensor fusion, IMU calibration, RealSense depth cameras, and deploying perception stacks to NVIDIA Jetson edge devices.",
+      link: "/docs/module-01-ros2/ros2-fundamentals/1.1.1-architecture",
     },
     {
       icon: Brain,
-      title: "Generative AI & Learning",
+      title: "Hands-On Labs",
       description:
-        "Deep dive into Vision-Language-Action models, reinforcement learning, imitation learning, and behavior models.",
-      link: "#",
+        "Build real ROS 2 nodes, create URDF robot descriptions, and deploy to hardware with step-by-step guided exercises.",
+      link: "/docs/labs/overview",
     },
     {
       icon: Factory,
-      title: "Real-World Deployment",
+      title: "Real-Time Control",
       description:
-        "Production case studies from Tesla, Figure AI, Boston Dynamics, and analysis of commercial applications.",
-      link: "#",
+        "Master QoS policies, latency budgeting, real-time constraints, and performance optimization for robot control loops.",
+      link: "/docs/module-01-ros2/ros2-fundamentals/1.1.4-qos-realtime",
     },
     {
       icon: Sparkles,
-      title: "Future Directions",
+      title: "2025 Industry Context",
       description:
-        "Explore ethics, safety standards, economic impacts, and the path to human-level dexterity and intelligence.",
-      link: "#",
+        "Understand the current state of physical AI, humanoid robotics market, and cutting-edge technologies from NVIDIA, Unitree, and more.",
+      link: "/docs/intro",
     },
   ];
 
@@ -155,41 +159,56 @@ function FeaturesSection() {
 function BookStructure() {
   const parts = [
     {
-      title: "Part I: Foundations",
+      title: "Module 1: ROS 2 Nervous System",
       chapters: [
-        "Chapter 1: Foundations of Physical AI",
-        "Chapter 2: Kinematics & Actuation",
+        "1.1.1 ROS 2 Architecture",
+        "1.1.2 rclpy Patterns",
+        "1.1.3 Parameters & Launch Files",
+        "1.1.4 QoS & Real-Time",
+        "1.2.1 URDF Basics",
+        "1.2.2 Sensors in URDF",
       ],
       color: "#3B82F6",
     },
     {
-      title: "Part II: Intelligence Systems",
+      title: "Module 2: Digital Twin (Coming Soon)",
       chapters: [
-        "Chapter 3: Edge Compute & Perception",
-        "Chapter 4: Control Systems",
-        "Chapter 5: Planning & Navigation",
-        "Chapter 6: Generative AI & Learning",
+        "Gazebo Simulation",
+        "Physics & Contacts",
+        "Sensor Simulation",
+        "Unity Integration",
       ],
       color: "#8B5CF6",
     },
     {
-      title: "Part III: Applications & Future",
+      title: "Module 3: AI-Robot Brain (Coming Soon)",
       chapters: [
-        "Chapter 7: Real-World Applications",
-        "Chapter 8: Economics & Manufacturing",
-        "Chapter 9: Ethics & Safety",
-        "Chapter 10: Future of Physical AI",
+        "NVIDIA Isaac Sim",
+        "Isaac ROS Perception",
+        "Nav2 Navigation",
+        "Edge Deployment",
       ],
       color: "#10B981",
+    },
+    {
+      title: "Module 4: VLA Models (Coming Soon)",
+      chapters: [
+        "Vision-Language-Action",
+        "Voice Commands",
+        "LLM Integration",
+        "Capstone Project",
+      ],
+      color: "#F59E0B",
     },
   ];
 
   return (
     <section className={styles.bookStructure}>
       <div className={styles.container}>
-        <h2 className={styles.sectionTitle}>Book Structure</h2>
+        <h2 className={styles.sectionTitle}>Course Modules</h2>
         <p className={styles.sectionSubtitle}>
-          10 comprehensive chapters organized into three progressive parts
+          4 comprehensive modules covering ROS 2, simulation, AI integration,
+          and voice-controlled autonomy
         </p>
         <div className={styles.partsGrid}>
           {parts.map((part, idx) => (
@@ -248,7 +267,11 @@ function AudienceSection() {
             const Icon = audience.icon;
             return (
               <div key={idx} className={styles.audienceCard}>
-                <Icon className={styles.audienceIcon} size={40} strokeWidth={1.5} />
+                <Icon
+                  className={styles.audienceIcon}
+                  size={40}
+                  strokeWidth={1.5}
+                />
                 <h4 className={styles.audienceLabel}>{audience.label}</h4>
                 <p className={styles.audienceDescription}>
                   {audience.description}
@@ -280,12 +303,12 @@ function CTASection() {
         <div className={styles.ctaButtons}>
           <Link
             className={styles.ctaPrimaryButton}
-            to="/docs/chapters/chapter-01-foundations"
+            to="/docs/module-01-ros2/overview"
           >
-            Begin Chapter 1 <ArrowRight className={styles.buttonIcon} />
+            Begin Module 1 <ArrowRight className={styles.buttonIcon} />
           </Link>
           <Link className={styles.ctaSecondaryButton} to="/docs/intro">
-            Browse All Chapters
+            View Full Book
           </Link>
         </div>
       </div>

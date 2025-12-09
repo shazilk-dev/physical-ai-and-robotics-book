@@ -33,6 +33,9 @@ export default function QuizAccordion({
   >({});
 
   useEffect(() => {
+    // Guard against SSR
+    if (typeof window === "undefined") return;
+
     // Load completion status from localStorage
     const loadCompletionStatus = () => {
       const status: Record<string, boolean> = {};
