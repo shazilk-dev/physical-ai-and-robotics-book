@@ -15,6 +15,11 @@ import re
 from pathlib import Path
 from typing import List, Dict, Any
 import tiktoken
+from dotenv import load_dotenv
+import hashlib
+
+# Load environment variables from .env file
+load_dotenv(Path(__file__).parent.parent / ".env")
 
 # Add parent directory to path to import RAGService
 sys.path.append(str(Path(__file__).parent.parent))
@@ -179,7 +184,10 @@ def process_file(file_path: Path, base_dir: Path, rag_service) -> int:
             
             # Upload to Qdrant
             from qdrant_client.models import PointStruct
-            point_id = f"{metadata['section']}_{i}"
+            
+            # Generate integer ID from file path and chunk index
+            id_string = f"{metadata['file_path']}_{i}"
+            point_id = int(hashlib.md5(id_string.encode()).hexdigest()[:8], 16)
             
             rag_service.qdrant_client.upsert(
                 collection_name=rag_service.collection_name,

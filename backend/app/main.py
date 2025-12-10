@@ -32,10 +32,10 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS Configuration
+# CORS Configuration - Allow all origins in development
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_origins=["*"],  # Allow all origins for development
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -61,8 +61,6 @@ async def health():
     }
 
 # Import routes
-from app.routes import auth
+from app.routes import auth, rag
 app.include_router(auth.router)
-# Note: RAG routes disabled until OpenAI/Qdrant configured
-# from app.routes import rag
-# app.include_router(rag.router)
+app.include_router(rag.router)

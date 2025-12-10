@@ -70,6 +70,9 @@ async def query_rag(request: QueryRequest):
         return QueryResponse(**result)
     
     except Exception as e:
+        import traceback
+        error_detail = traceback.format_exc()
+        print(f"❌ RAG Query Error: {error_detail}")
         raise HTTPException(
             status_code=500,
             detail=f"Error processing query: {str(e)}"

@@ -3,10 +3,15 @@ RAG Service for Physical AI Book
 Handles vector search and response generation
 """
 import os
+from pathlib import Path
 from typing import List, Dict, Any
 from openai import OpenAI
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct, Filter, FieldCondition, MatchValue
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv(Path(__file__).parent.parent.parent / ".env")
 
 class RAGService:
     def __init__(self):
@@ -59,12 +64,12 @@ class RAGService:
                 must=[FieldCondition(key="module", match=MatchValue(value=module))]
             )
         
-        search_result = self.qdrant_client.search(
+        search_result = self.qdrant_client.query_points(
             collection_name=self.collection_name,
-            query_vector=query_vector,
+            query=query_vector,
             limit=limit,
             query_filter=query_filter
-        )
+        ).points
         
         results = []
         for hit in search_result:

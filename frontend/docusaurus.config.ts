@@ -54,7 +54,9 @@ const config: Config = {
       {
         docs: {
           sidebarPath: "./sidebars.ts",
-          routeBasePath: "docs", // Changed back to /docs
+          routeBasePath: "docs",
+          sidebarCollapsible: true,
+          sidebarCollapsed: false,
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:

@@ -1,126 +1,47 @@
 /* ========================================
-   Professional Sidebar Styling - Clean & Functional
-   
-   PRINCIPLE: Zero interference with Docusaurus behavior
-   Only colors, fonts, spacing - no structural changes
+   Professional Sidebar Styling
+   Pure Visual Styling - Zero Behavior Override
    ======================================== */
 
-/* Main Sidebar Container */
+/* Container Background */
 .theme-doc-sidebar-container {
-  border-right: 1px solid #e2e8f0;
-  background: #fafbfc;
+  border-right: 1px solid var(--ifm-toc-border-color);
+  background: var(--ifm-background-surface-color);
 }
 
-[data-theme="dark"] .theme-doc-sidebar-container {
-  border-right: 1px solid #2d3748;
-  background: #1a202c;
-}
-
-/* Sidebar Width */
-aside[class*="docSidebarContainer"] {
-  min-width: 280px;
-  max-width: 320px;
-}
-
-/* Menu Spacing */
-.menu {
-  padding: 0 1rem;
-  font-size: 0.9375rem;
-}
-
-/* Regular Links - Colors & Spacing Only */
+/* Links Visual Style */
 .menu__link {
-  border-radius: 10px;
-  padding: 0.75rem 1rem;
-  font-weight: 500;
-  color: #475569;
-  font-size: 0.9375rem;
-  min-height: 42px;
-  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
-}
-
-[data-theme="dark"] .menu__link {
-  color: #e2e8f0;
+  border-radius: 8px;
+  color: var(--ifm-menu-color);
+  transition: background-color 0.2s ease;
 }
 
 .menu__link:hover {
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-  color: #1e40af;
-  text-decoration: none;
-  transform: translateX(3px);
+  background: var(--ifm-menu-color-background-hover);
+  color: var(--ifm-menu-color-active);
 }
 
-[data-theme="dark"] .menu__link:hover {
-  background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%);
-  color: #93c5fd;
-}
-
-/* Active Link */
 .menu__link--active {
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-  color: #2563eb;
+  background: var(--ifm-menu-color-background-active);
+  color: var(--ifm-menu-color-active);
   font-weight: 600;
 }
 
-[data-theme="dark"] .menu__link--active {
-  background: linear-gradient(135deg, #1e3a5f 0%, #1e40af 100%);
-  color: #60a5fa;
-}
-
-/* Category Headers - Colors Only, No Structural Changes */
+/* Category Headers */
 .menu__link--sublist {
   font-weight: 700;
-  font-size: 0.9375rem;
-  color: #0f172a;
-  padding: 0.875rem 1rem;
-  min-height: 44px;
-  border-radius: 10px;
-}
-
-[data-theme="dark"] .menu__link--sublist {
-  color: #f1f5f9;
+  color: var(--ifm-heading-color);
 }
 
 .menu__link--sublist:hover {
-  background: #f8fafc;
-  color: #1e40af;
+  background: var(--ifm-menu-color-background-hover);
 }
 
-[data-theme="dark"] .menu__link--sublist:hover {
-  background: #0f172a;
-  color: #93c5fd;
-}
-
-/* Active Category */
-.menu__list-item-collapsible--active > .menu__link--sublist {
-  color: #2563eb;
-  font-weight: 700;
-}
-
-[data-theme="dark"]
-  .menu__list-item-collapsible--active
-  > .menu__link--sublist {
-  color: #60a5fa;
-}
-
-/* Nested Items - Visual Hierarchy */
+/* Nested Items */
 .menu__list .menu__list {
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
   padding-left: 1rem;
-  border-left: 2px solid #cbd5e1;
+  border-left: 1px solid var(--ifm-toc-border-color);
   margin-left: 1rem;
-}
-
-[data-theme="dark"] .menu__list .menu__list {
-  border-left-color: #334155;
-}
-
-.menu__list .menu__list .menu__link {
-  font-size: 0.875rem;
-  padding: 0.625rem 0.875rem;
-  min-height: 38px;
-  border-radius: 8px;
 }
 
 /* Scrollbar */
@@ -128,67 +49,7 @@ aside[class*="docSidebarContainer"] {
   width: 6px;
 }
 
-.theme-doc-sidebar-container::-webkit-scrollbar-track {
-  background: transparent;
-}
-
 .theme-doc-sidebar-container::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--ifm-scrollbar-thumb-background-color);
   border-radius: 3px;
-}
-
-.theme-doc-sidebar-container::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-[data-theme="dark"] .theme-doc-sidebar-container::-webkit-scrollbar-thumb {
-  background: #475569;
-}
-
-[data-theme="dark"]
-  .theme-doc-sidebar-container::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
-}
-
-/* Focus States */
-.menu__link:focus-visible {
-  outline: 2px solid #2563eb;
-  outline-offset: 2px;
-}
-
-[data-theme="dark"] .menu__link:focus-visible {
-  outline-color: #60a5fa;
-}
-
-/* Mobile Responsive */
-@media (max-width: 996px) {
-  .theme-doc-sidebar-container {
-    border-right: none;
-  }
-
-  aside[class*="docSidebarContainer"] {
-    max-width: 100%;
-    min-width: 100%;
-  }
-
-  .menu {
-    padding: 0 1.5rem;
-  }
-}
-
-/* Tablet Responsive */
-@media (max-width: 1280px) and (min-width: 997px) {
-  aside[class*="docSidebarContainer"] {
-    min-width: 260px;
-    max-width: 280px;
-  }
-
-  .menu__link {
-    font-size: 0.875rem;
-    padding: 0.5rem 0.75rem;
-  }
-
-  .menu__list .menu__list .menu__link {
-    font-size: 0.8125rem;
-  }
 }
