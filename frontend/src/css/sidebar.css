@@ -120,13 +120,9 @@ aside[class*="docSidebarContainer"] {
   min-height: 44px;
   border-radius: 10px;
   background: transparent;
-  cursor: pointer;
+  cursor: pointer !important;
   user-select: none;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   position: relative;
-  width: 100%;
 }
 
 [data-theme="dark"] .menu__link--sublist {
@@ -148,7 +144,7 @@ aside[class*="docSidebarContainer"] {
 .menu__caret {
   transition: transform 0.2s ease;
   color: #94a3b8;
-  pointer-events: none;
+  pointer-events: none !important;
 }
 
 .menu__caret::before {
@@ -294,12 +290,6 @@ a.menu__link[href*="lab"]:hover::before {
 
 [data-theme="dark"] .menu__link--active::before {
   box-shadow: 0 2px 6px rgba(96, 165, 250, 0.4);
-}
-
-/* Smooth Expand/Collapse Animation */
-.menu__list-item-collapsible .menu__list {
-  transition: max-height 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
-  overflow: hidden;
 }
 
 /* Scrollbar Styling */
