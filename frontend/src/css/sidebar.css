@@ -1,13 +1,15 @@
 /* ========================================
    Professional Sidebar Styling
    Modern, Clean, Minimal, User-Friendly
+   
+   CRITICAL: Do NOT override Docusaurus's collapse/expand behavior
+   Only style visual appearance, not interactive functionality
    ======================================== */
 
 /* Main Sidebar Container */
 .theme-doc-sidebar-container {
   border-right: 1px solid #e2e8f0 !important;
   background: #fafbfc !important;
-  transition: all 0.3s ease;
 }
 
 [data-theme="dark"] .theme-doc-sidebar-container {
@@ -17,14 +19,8 @@
 
 /* Sidebar Content Area */
 aside[class*="docSidebarContainer"] {
-  background: transparent;
   min-width: 280px;
   max-width: 320px;
-}
-
-/* Sidebar Inner Wrapper */
-.sidebar {
-  padding: 1.5rem 0;
 }
 
 /* Menu Container */
@@ -33,32 +29,15 @@ aside[class*="docSidebarContainer"] {
   font-size: 0.9375rem;
 }
 
-/* Category Labels */
-.menu__list-item {
-  margin: 0.375rem 0;
-  position: relative;
-}
-
-.menu__list-item-collapsible {
-  margin: 1rem 0;
-}
-
-/* Menu Links - User Friendly */
+/* Menu Links - Visual Styling Only */
 .menu__link {
   border-radius: 10px;
   padding: 0.75rem 1rem;
   font-weight: 500;
   color: #475569;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  line-height: 1.5;
-  position: relative;
   font-size: 0.9375rem;
   min-height: 42px;
-  cursor: pointer;
-  user-select: none;
 }
 
 [data-theme="dark"] .menu__link {
@@ -84,7 +63,6 @@ aside[class*="docSidebarContainer"] {
   color: #2563eb;
   font-weight: 600;
   box-shadow: 0 2px 6px rgba(37, 99, 235, 0.08);
-  position: relative;
 }
 
 .menu__link--active::before {
@@ -109,20 +87,14 @@ aside[class*="docSidebarContainer"] {
   background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%);
 }
 
-/* Category Headers - More User Friendly */
+/* Category Headers - Visual Styling Only (DO NOT override click behavior) */
 .menu__link--sublist {
   font-weight: 700;
   font-size: 0.9375rem;
-  text-transform: none;
-  letter-spacing: -0.01em;
   color: #0f172a;
   padding: 0.875rem 1rem;
   min-height: 44px;
   border-radius: 10px;
-  background: transparent;
-  cursor: pointer !important;
-  user-select: none;
-  position: relative;
 }
 
 [data-theme="dark"] .menu__link--sublist {
@@ -132,7 +104,6 @@ aside[class*="docSidebarContainer"] {
 .menu__link--sublist:hover {
   background: #f8fafc;
   color: #1e40af;
-  transform: none;
 }
 
 [data-theme="dark"] .menu__link--sublist:hover {
@@ -140,24 +111,17 @@ aside[class*="docSidebarContainer"] {
   color: #93c5fd;
 }
 
-/* Category Toggle Arrow */
-.menu__caret {
-  transition: transform 0.2s ease;
-  color: #94a3b8;
-  pointer-events: none !important;
-}
-
+/* Category Toggle Arrow - Styling Only */
 .menu__caret::before {
-  background: var(--ifm-menu-link-sublist-icon) 50% / 1.25rem 1.25rem !important;
-  filter: none;
   opacity: 0.6;
-  transition: all 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 
 .menu__link--sublist:hover .menu__caret::before {
   opacity: 1;
 }
 
+/* Active Category */
 .menu__list-item-collapsible--active > .menu__link--sublist {
   color: #2563eb;
   font-weight: 700;
@@ -169,7 +133,7 @@ aside[class*="docSidebarContainer"] {
   color: #60a5fa;
 }
 
-/* Nested Menu Items - Better Visual Hierarchy */
+/* Nested Menu Items */
 .menu__list .menu__list {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
@@ -189,22 +153,17 @@ aside[class*="docSidebarContainer"] {
   border-radius: 8px;
 }
 
-/* Professional Icon Support - Pure CSS Geometric Icons */
+/* Professional Icons - Pure CSS Geometric Shapes */
 .menu__link::before {
   content: "";
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: inline-block;
   width: 6px;
   height: 6px;
   margin-right: 0.75rem;
   border-radius: 50%;
   background: #94a3b8;
   transition: all 0.2s ease;
-  flex-shrink: 0;
   vertical-align: middle;
-  position: relative;
-  top: 0;
 }
 
 /* Getting Started - Diamond */
@@ -214,7 +173,6 @@ aside[class*="docSidebarContainer"] {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   width: 8px;
   height: 8px;
-  top: 0;
 }
 
 /* Module Categories - No icon */
@@ -222,7 +180,7 @@ aside[class*="docSidebarContainer"] {
   display: none;
 }
 
-/* Core Concepts - Hexagon effect */
+/* Core Concepts - Hexagon */
 a.menu__link[href*="fundamentals"]::before,
 a.menu__link[href*="architecture"]::before,
 a.menu__link[href*="rclpy"]::before,
@@ -233,10 +191,9 @@ a.menu__link[href*="qos"]::before {
   width: 10px;
   height: 10px;
   border-radius: 0;
-  top: 0;
 }
 
-/* Robot Description - Double square */
+/* Robot Description - Hollow Square */
 a.menu__link[href*="robot"]::before,
 a.menu__link[href*="urdf"]::before {
   border: 2px solid #10b981;
@@ -244,7 +201,6 @@ a.menu__link[href*="urdf"]::before {
   width: 8px;
   height: 8px;
   border-radius: 2px;
-  top: 0;
 }
 
 /* Labs - Triangle */
@@ -257,13 +213,12 @@ a.menu__link[href*="lab"]::before {
   background: transparent;
   border-radius: 0;
   margin-right: 0.8rem;
-  top: 0;
 }
 
+/* Icon Hover Effects */
 .menu__link:hover::before {
   transform: scale(1.2);
   box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
-  top: 0;
 }
 
 .menu__link[href*="intro"]:hover::before {
@@ -283,15 +238,6 @@ a.menu__link[href*="lab"]:hover::before {
   background: #60a5fa;
 }
 
-.menu__link--active::before {
-  transform: scale(1.15);
-  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
-}
-
-[data-theme="dark"] .menu__link--active::before {
-  box-shadow: 0 2px 6px rgba(96, 165, 250, 0.4);
-}
-
 /* Scrollbar Styling */
 .theme-doc-sidebar-container::-webkit-scrollbar {
   width: 6px;
@@ -304,7 +250,6 @@ a.menu__link[href*="lab"]:hover::before {
 .theme-doc-sidebar-container::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 3px;
-  transition: background 0.2s ease;
 }
 
 .theme-doc-sidebar-container::-webkit-scrollbar-thumb:hover {
@@ -318,55 +263,6 @@ a.menu__link[href*="lab"]:hover::before {
 [data-theme="dark"]
   .theme-doc-sidebar-container::-webkit-scrollbar-thumb:hover {
   background: #64748b;
-}
-
-/* Back to Top Link */
-.theme-doc-sidebar-item-link[href="#"] {
-  color: #2563eb;
-  font-weight: 600;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e2e8f0;
-}
-
-[data-theme="dark"] .theme-doc-sidebar-item-link[href="#"] {
-  color: #60a5fa;
-  border-top-color: #2d3748;
-}
-
-/* Section Dividers */
-.menu__list-item:has(> .menu__link--sublist) {
-  margin-top: 1.25rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e2e8f0;
-}
-
-.menu__list-item:first-child:has(> .menu__link--sublist) {
-  margin-top: 0;
-  padding-top: 0;
-  border-top: none;
-}
-
-[data-theme="dark"] .menu__list-item:has(> .menu__link--sublist) {
-  border-top-color: #2d3748;
-}
-
-/* Professional Badge for New/Updated Items */
-.menu__link[data-badge]::after {
-  content: attr(data-badge);
-  margin-left: auto;
-  padding: 0.125rem 0.5rem;
-  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
-  color: white;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  border-radius: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
-}
-
-[data-theme="dark"] .menu__link[data-badge]::after {
-  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
 }
 
 /* Focus States for Accessibility */
@@ -412,63 +308,4 @@ a.menu__link[href*="lab"]:hover::before {
   .menu__list .menu__list .menu__link {
     font-size: 0.8125rem;
   }
-}
-
-/* Animation for Sidebar Items */
-.menu__list-item {
-  animation: fadeInLeft 0.3s ease-out;
-  animation-fill-mode: both;
-}
-
-@keyframes fadeInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* Stagger Animation Delay */
-.menu__list-item:nth-child(1) {
-  animation-delay: 0.05s;
-}
-.menu__list-item:nth-child(2) {
-  animation-delay: 0.1s;
-}
-.menu__list-item:nth-child(3) {
-  animation-delay: 0.15s;
-}
-.menu__list-item:nth-child(4) {
-  animation-delay: 0.2s;
-}
-.menu__list-item:nth-child(5) {
-  animation-delay: 0.25s;
-}
-.menu__list-item:nth-child(6) {
-  animation-delay: 0.3s;
-}
-
-/* Hover Effect for Category Headers */
-.menu__link--sublist::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0.875rem;
-  right: 0.875rem;
-  height: 2px;
-  background: linear-gradient(90deg, #2563eb 0%, transparent 100%);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.3s ease;
-}
-
-.menu__link--sublist:hover::after {
-  transform: scaleX(1);
-}
-
-[data-theme="dark"] .menu__link--sublist::after {
-  background: linear-gradient(90deg, #60a5fa 0%, transparent 100%);
 }
