@@ -1,43 +1,42 @@
 /* ========================================
-   Professional Sidebar Styling
-   Modern, Clean, Minimal, User-Friendly
+   Professional Sidebar Styling - Clean & Functional
    
-   CRITICAL: Do NOT override Docusaurus's collapse/expand behavior
-   Only style visual appearance, not interactive functionality
+   PRINCIPLE: Zero interference with Docusaurus behavior
+   Only colors, fonts, spacing - no structural changes
    ======================================== */
 
 /* Main Sidebar Container */
 .theme-doc-sidebar-container {
-  border-right: 1px solid #e2e8f0 !important;
-  background: #fafbfc !important;
+  border-right: 1px solid #e2e8f0;
+  background: #fafbfc;
 }
 
 [data-theme="dark"] .theme-doc-sidebar-container {
-  border-right: 1px solid #2d3748 !important;
-  background: #1a202c !important;
+  border-right: 1px solid #2d3748;
+  background: #1a202c;
 }
 
-/* Sidebar Content Area */
+/* Sidebar Width */
 aside[class*="docSidebarContainer"] {
   min-width: 280px;
   max-width: 320px;
 }
 
-/* Menu Container */
+/* Menu Spacing */
 .menu {
   padding: 0 1rem;
   font-size: 0.9375rem;
 }
 
-/* Menu Links - Visual Styling Only */
+/* Regular Links - Colors & Spacing Only */
 .menu__link {
   border-radius: 10px;
   padding: 0.75rem 1rem;
   font-weight: 500;
   color: #475569;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 0.9375rem;
   min-height: 42px;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
 [data-theme="dark"] .menu__link {
@@ -49,7 +48,6 @@ aside[class*="docSidebarContainer"] {
   color: #1e40af;
   text-decoration: none;
   transform: translateX(3px);
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
 }
 
 [data-theme="dark"] .menu__link:hover {
@@ -62,32 +60,14 @@ aside[class*="docSidebarContainer"] {
   background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
   color: #2563eb;
   font-weight: 600;
-  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.08);
-}
-
-.menu__link--active::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 60%;
-  background: linear-gradient(180deg, #2563eb 0%, #3b82f6 100%);
-  border-radius: 0 2px 2px 0;
 }
 
 [data-theme="dark"] .menu__link--active {
   background: linear-gradient(135deg, #1e3a5f 0%, #1e40af 100%);
   color: #60a5fa;
-  box-shadow: 0 2px 6px rgba(96, 165, 250, 0.12);
 }
 
-[data-theme="dark"] .menu__link--active::before {
-  background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%);
-}
-
-/* Category Headers - Visual Styling Only (DO NOT override click behavior) */
+/* Category Headers - Colors Only, No Structural Changes */
 .menu__link--sublist {
   font-weight: 700;
   font-size: 0.9375rem;
@@ -111,16 +91,6 @@ aside[class*="docSidebarContainer"] {
   color: #93c5fd;
 }
 
-/* Category Toggle Arrow - Styling Only */
-.menu__caret::before {
-  opacity: 0.6;
-  transition: opacity 0.2s ease;
-}
-
-.menu__link--sublist:hover .menu__caret::before {
-  opacity: 1;
-}
-
 /* Active Category */
 .menu__list-item-collapsible--active > .menu__link--sublist {
   color: #2563eb;
@@ -133,7 +103,7 @@ aside[class*="docSidebarContainer"] {
   color: #60a5fa;
 }
 
-/* Nested Menu Items */
+/* Nested Items - Visual Hierarchy */
 .menu__list .menu__list {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
@@ -153,92 +123,7 @@ aside[class*="docSidebarContainer"] {
   border-radius: 8px;
 }
 
-/* Professional Icons - Pure CSS Geometric Shapes */
-.menu__link::before {
-  content: "";
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  margin-right: 0.75rem;
-  border-radius: 50%;
-  background: #94a3b8;
-  transition: all 0.2s ease;
-  vertical-align: middle;
-}
-
-/* Getting Started - Diamond */
-.menu__link[href*="intro"]::before {
-  border-radius: 2px;
-  transform: rotate(45deg);
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  width: 8px;
-  height: 8px;
-}
-
-/* Module Categories - No icon */
-.menu__link--sublist::before {
-  display: none;
-}
-
-/* Core Concepts - Hexagon */
-a.menu__link[href*="fundamentals"]::before,
-a.menu__link[href*="architecture"]::before,
-a.menu__link[href*="rclpy"]::before,
-a.menu__link[href*="parameters"]::before,
-a.menu__link[href*="qos"]::before {
-  clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
-  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
-  width: 10px;
-  height: 10px;
-  border-radius: 0;
-}
-
-/* Robot Description - Hollow Square */
-a.menu__link[href*="robot"]::before,
-a.menu__link[href*="urdf"]::before {
-  border: 2px solid #10b981;
-  background: transparent;
-  width: 8px;
-  height: 8px;
-  border-radius: 2px;
-}
-
-/* Labs - Triangle */
-a.menu__link[href*="lab"]::before {
-  width: 0;
-  height: 0;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-bottom: 9px solid #f59e0b;
-  background: transparent;
-  border-radius: 0;
-  margin-right: 0.8rem;
-}
-
-/* Icon Hover Effects */
-.menu__link:hover::before {
-  transform: scale(1.2);
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
-}
-
-.menu__link[href*="intro"]:hover::before {
-  transform: rotate(45deg) scale(1.2);
-}
-
-a.menu__link[href*="lab"]:hover::before {
-  border-bottom-color: #d97706;
-  transform: scale(1.2);
-}
-
-[data-theme="dark"] .menu__link::before {
-  background: #64748b;
-}
-
-[data-theme="dark"] .menu__link:hover::before {
-  background: #60a5fa;
-}
-
-/* Scrollbar Styling */
+/* Scrollbar */
 .theme-doc-sidebar-container::-webkit-scrollbar {
   width: 6px;
 }
@@ -265,22 +150,20 @@ a.menu__link[href*="lab"]:hover::before {
   background: #64748b;
 }
 
-/* Focus States for Accessibility */
+/* Focus States */
 .menu__link:focus-visible {
   outline: 2px solid #2563eb;
   outline-offset: 2px;
-  background: #eff6ff;
 }
 
 [data-theme="dark"] .menu__link:focus-visible {
   outline-color: #60a5fa;
-  background: #1e3a5f;
 }
 
-/* Mobile Sidebar */
+/* Mobile Responsive */
 @media (max-width: 996px) {
   .theme-doc-sidebar-container {
-    border-right: none !important;
+    border-right: none;
   }
 
   aside[class*="docSidebarContainer"] {
@@ -293,7 +176,7 @@ a.menu__link[href*="lab"]:hover::before {
   }
 }
 
-/* Compact Mode for Smaller Screens */
+/* Tablet Responsive */
 @media (max-width: 1280px) and (min-width: 997px) {
   aside[class*="docSidebarContainer"] {
     min-width: 260px;
