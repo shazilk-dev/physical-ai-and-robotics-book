@@ -124,6 +124,8 @@ aside[class*="docSidebarContainer"] {
   min-height: 44px;
   border-radius: 10px;
   background: transparent;
+  cursor: pointer;
+  user-select: none;
 }
 
 [data-theme="dark"] .menu__link--sublist {
@@ -145,6 +147,7 @@ aside[class*="docSidebarContainer"] {
 .menu__caret {
   transition: transform 0.2s ease;
   color: #94a3b8;
+  pointer-events: none;
 }
 
 .menu__caret::before {
