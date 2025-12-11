@@ -27,14 +27,20 @@
   font-weight: 600;
 }
 
-/* Category Headers */
+/* Category Headers - Ensure clickable */
 .menu__link--sublist {
   font-weight: 700;
   color: var(--ifm-heading-color);
+  cursor: pointer !important;
 }
 
 .menu__link--sublist:hover {
   background: var(--ifm-menu-color-background-hover);
+}
+
+/* Ensure caret is clickable */
+.menu__caret {
+  cursor: pointer !important;
 }
 
 /* Nested Items */

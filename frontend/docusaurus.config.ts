@@ -60,7 +60,7 @@ const config: Config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            "https://github.com/shazilk-dev/physical-ai-and-robotics-book/tree/main/docs/",
+            "https://github.com/shazilk-dev/physical-ai-and-robotics-book/tree/main/frontend/docs/",
         },
         blog: false, // Disable blog
         theme: {
