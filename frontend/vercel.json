@@ -1,8 +1,47 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "npm run clear && npm run build",
   "outputDirectory": "build",
   "framework": "docusaurus",
+  "cleanUrls": true,
+  "trailingSlash": false,
   "github": {
     "silent": true
-  }
+  },
+  "headers": [
+    {
+      "source": "/assets/css/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/assets/js/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
+    }
+  ]
 }

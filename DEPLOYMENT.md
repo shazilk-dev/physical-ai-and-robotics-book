@@ -1,5 +1,54 @@
 # 🚀 Deployment Guide - Physical AI Textbook
 
+## ⚠️ VERCEL DEPLOYMENT FIX (December 11, 2025)
+
+### Problem: Works Locally But Not on Vercel
+
+- ✅ Sidebar collapse works locally
+- ✅ ChatBot visible locally
+- ❌ Sidebar doesn't collapse on Vercel
+- ❌ ChatBot not visible on Vercel
+
+### Root Cause: **Vercel is caching old build files**
+
+### ✅ Solution Applied:
+
+1. Updated `vercel.json` with `npm run clear && npm run build`
+2. Added `Cache-Control` headers to force re-validation
+3. Fixed CSS z-index for ChatBot (999999)
+4. Added JavaScript fix in Root.tsx
+
+### 🚨 IMMEDIATE ACTION REQUIRED:
+
+**Step 1: Commit Changes**
+
+```bash
+git add .
+git commit -m "Fix: Vercel cache busting and UI fixes"
+git push origin main
+```
+
+**Step 2: Force Redeploy in Vercel**
+
+1. Go to https://vercel.com/dashboard
+2. Select your project
+3. Go to latest deployment → Click **"⋯"** → **"Redeploy"**
+4. **UNCHECK** "Use existing Build Cache" ✅ THIS IS CRITICAL
+5. Click **"Redeploy"**
+
+**Step 3: Clear Browser Cache**
+
+- Hard refresh: **Ctrl+Shift+R** (Windows) or **Cmd+Shift+R** (Mac)
+- Or open in **Incognito mode**
+
+**Expected Result:**
+
+- ✅ Sidebar categories collapse/expand
+- ✅ ChatBot button visible (bottom-right)
+- ✅ Everything works like localhost
+
+---
+
 ## Overview
 
 This project has **2 deployments**:
