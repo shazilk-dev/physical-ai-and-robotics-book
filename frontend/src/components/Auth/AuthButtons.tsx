@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import ExecutionEnvironment from "@docusaurus/ExecutionEnvironment";
 import LoginModal from "./LoginModal";
 import SignupModal from "./SignupModal";
 import styles from "./AuthButtons.module.css";
@@ -30,14 +29,9 @@ export default function AuthButtons() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [showMenu, setShowMenu] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
 
-  // Only run on client-side to prevent hydration mismatch
   useEffect(() => {
-    setIsMounted(true);
-    if (ExecutionEnvironment.canUseDOM) {
-      checkSession();
-    }
+    checkSession();
   }, []);
 
   useEffect(() => {
@@ -90,15 +84,6 @@ export default function AuthButtons() {
       console.error("Error signing out:", error);
     }
   };
-
-  // Prevent hydration mismatch by not rendering until client-side
-  if (!isMounted) {
-    return (
-      <div className={styles.loadingSkeleton}>
-        <div className={styles.skeletonAvatar}></div>
-      </div>
-    );
-  }
 
   if (loading) {
     return (

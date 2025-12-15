@@ -4,7 +4,6 @@
  */
 
 import React, { useState, useRef, useEffect } from "react";
-import ExecutionEnvironment from "@docusaurus/ExecutionEnvironment";
 import {
   MessageCircle,
   X,
@@ -49,7 +48,6 @@ const API_URL =
     : "http://localhost:8000/api/v1";
 
 export default function ChatWidget() {
-  const [isMounted, setIsMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -63,11 +61,6 @@ export default function ChatWidget() {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  // Prevent SSR issues - only render on client
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -210,11 +203,6 @@ export default function ChatWidget() {
       </div>
     );
   };
-
-  // Don't render until mounted on client-side
-  if (!isMounted || !ExecutionEnvironment.canUseDOM) {
-    return null;
-  }
 
   return (
     <>
