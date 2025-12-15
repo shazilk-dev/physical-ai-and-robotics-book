@@ -48,8 +48,10 @@ const getApiUrl = () => {
     return (window as any).docusaurus.siteConfig.customFields.apiUrl;
   }
 
-  // Check if running on production domain
-  if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
+  // Check if running on production domain (Vercel)
+  if (typeof window !== 'undefined' &&
+      (window.location.hostname.includes('vercel.app') ||
+       window.location.hostname.includes('physical-ai-robotics-book'))) {
     return 'https://physical-ai-and-robotics-book.onrender.com/api/v1';
   }
 

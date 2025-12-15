@@ -20,6 +20,7 @@ class Settings(BaseSettings):
         "http://127.0.0.1:3000",
         "http://127.0.0.1:3001",
         "https://physical-ai-robotics-book.vercel.app",  # Vercel production
+        "https://physical-ai-and-robotics-book-front.vercel.app",  # Current Vercel URL
         "https://shazilk-dev.github.io"
     ]
     
