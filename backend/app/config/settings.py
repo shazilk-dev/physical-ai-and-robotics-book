@@ -13,15 +13,19 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     ENVIRONMENT: str = "development"  # "development" or "production"
 
-    # CORS
+    # CORS - Allow all variations of frontend URLs
     ALLOWED_ORIGINS: List[str] = [
+        # Local development
         "http://localhost:3000",
         "http://localhost:3001",
         "http://127.0.0.1:3000",
         "http://127.0.0.1:3001",
-        "https://physical-ai-robotics-book.vercel.app",  # Vercel production
-        "https://physical-ai-and-robotics-book-front.vercel.app",  # Current Vercel URL
-        "https://shazilk-dev.github.io"
+        # Vercel production URLs (all variations)
+        "https://physical-ai-robotics-book.vercel.app",
+        "https://physical-ai-and-robotics-book-front.vercel.app",
+        "https://physical-ai-and-robotics-book.vercel.app",
+        # GitHub Pages
+        "https://shazilk-dev.github.io",
     ]
     
     # Database (Neon Postgres)

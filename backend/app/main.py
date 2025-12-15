@@ -35,6 +35,14 @@ app = FastAPI(
 # CORS Configuration
 # IMPORTANT: Cannot use wildcard "*" with credentials=True
 # Always use specific origins when credentials are enabled
+
+# Debug: Print allowed origins on startup
+print("="*50)
+print("🌐 CORS Configuration:")
+print(f"   Allowed Origins: {settings.ALLOWED_ORIGINS}")
+print(f"   Environment: {settings.ENVIRONMENT}")
+print("="*50)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.ALLOWED_ORIGINS,
@@ -61,6 +69,15 @@ async def health():
         "status": "healthy",
         "database": "connected",
         "vector_store": "not_configured"
+    }
+
+@app.get("/cors-test")
+async def cors_test():
+    """Test CORS configuration"""
+    return {
+        "message": "CORS is working!",
+        "allowed_origins": settings.ALLOWED_ORIGINS,
+        "environment": settings.ENVIRONMENT
     }
 
 # Import routes
