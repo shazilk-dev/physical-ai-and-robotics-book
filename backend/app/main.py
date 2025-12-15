@@ -32,14 +32,25 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS Configuration - Allow all origins in development
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for development
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# CORS Configuration
+# In production, only allow specific origins from settings
+# In development, allow all origins for easier testing
+if settings.ENVIRONMENT == "production":
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.ALLOWED_ORIGINS,
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allow_headers=["*"],
+    )
+else:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # Allow all origins in development
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 @app.get("/")
 async def root():

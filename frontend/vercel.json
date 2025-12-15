@@ -7,6 +7,9 @@
   "github": {
     "silent": true
   },
+  "env": {
+    "DOCUSAURUS_CACHE": "false"
+  },
   "headers": [
     {
       "source": "/assets/css/(.*)",

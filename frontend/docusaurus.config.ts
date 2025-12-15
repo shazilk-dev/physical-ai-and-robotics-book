@@ -28,6 +28,7 @@ const config: Config = {
   projectName: "physical-ai-and-robotics-book", // Usually your repo name.
 
   onBrokenLinks: "throw",
+  onBrokenMarkdownLinks: "warn",
 
   // Don't generate static files for API routes
   onDuplicateRoutes: "warn",

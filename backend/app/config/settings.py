@@ -11,13 +11,15 @@ class Settings(BaseSettings):
     APP_NAME: str = "Physical AI RAG API"
     APP_VERSION: str = "0.1.0"
     DEBUG: bool = True
-    
+    ENVIRONMENT: str = "development"  # "development" or "production"
+
     # CORS
     ALLOWED_ORIGINS: List[str] = [
         "http://localhost:3000",
         "http://localhost:3001",
         "http://127.0.0.1:3000",
         "http://127.0.0.1:3001",
+        "https://physical-ai-robotics-book.vercel.app",  # Vercel production
         "https://shazilk-dev.github.io"
     ]
     

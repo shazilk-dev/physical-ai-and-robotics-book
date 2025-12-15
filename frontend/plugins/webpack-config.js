@@ -3,6 +3,8 @@ module.exports = function (context, options) {
     name: "docusaurus-plugin-webpack-config",
     configureWebpack(config, isServer) {
       return {
+        // Disable persistent cache on Vercel to avoid serialization issues
+        cache: process.env.VERCEL ? false : config.cache,
         externals: isServer
           ? {
               bufferutil: "bufferutil",
