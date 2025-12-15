@@ -1,0 +1,122 @@
+# IMU Calibration Parameters
+# Lab 3: Sensor Fusion
+# =====================
+
+# Complementary Filter Parameters
+complementary_filter:
+  alpha: 0.98  # High-pass coefficient (trust gyro 98%, accel 2%)
+  update_rate: 100  # Hz (IMU callback rate)
+
+# Gyroscope Bias (rad/s)
+# These values should be subtracted from raw gyroscope readings
+# Obtained through static calibration (robot stationary for 30s)
+gyroscope_bias:
+  x: 0.003   # Roll axis bias
+  y: -0.002  # Pitch axis bias
+  z: 0.001   # Yaw axis bias
+
+# Accelerometer Calibration
+# Scale factors and offsets for each axis
+accelerometer:
+  # Scale factors (dimensionless)
+  scale:
+    x: 1.003
+    y: 0.998
+    z: 1.001
+
+  # Offsets (m/s²)
+  offset:
+    x: 0.05
+    y: -0.03
+    z: 0.02
+
+  # Expected gravity magnitude (m/s²)
+  gravity: 9.81
+
+# Coordinate Frame Definitions
+frames:
+  imu_frame: "imu_link"
+  base_frame: "base_link"
+
+  # Transform from IMU to base_link (if IMU is mounted at an angle)
+  imu_to_base:
+    translation: [0.0, 0.0, 0.1]  # [x, y, z] in meters
+    rotation: [0.0, 0.0, 0.0]      # [roll, pitch, yaw] in radians
+
+# RealSense Camera Parameters
+realsense:
+  depth_scale: 0.001  # Convert mm to meters
+  min_depth: 0.3      # Minimum reliable depth (meters)
+  max_depth: 10.0     # Maximum reliable depth (meters)
+
+  # Region of Interest for obstacle detection (pixels)
+  roi:
+    center_x: 320  # Image width / 2
+    center_y: 240  # Image height / 2
+    width: 200     # ROI width
+    height: 200    # ROI height
+
+  # Obstacle detection thresholds
+  obstacle_distance: 1.0  # meters (warn if closer)
+
+# State Estimation Parameters
+state_estimation:
+  publish_rate: 50  # Hz (output state frequency)
+
+  # Confidence thresholds
+  confidence:
+    low: 0.5
+    medium: 0.8
+    high: 0.95
+
+  # Outlier rejection (discard measurements beyond N sigma)
+  outlier_rejection:
+    enabled: true
+    sigma_threshold: 3.0
+
+# Sensor Health Monitoring
+health_monitoring:
+  # Maximum time without IMU data before warning (seconds)
+  imu_timeout: 0.5
+
+  # Maximum time without depth data before warning (seconds)
+  depth_timeout: 1.0
+
+  # Expected data rates (for monitoring)
+  expected_rates:
+    imu: 100  # Hz
+    depth: 30  # Hz
+
+# Logging Configuration
+logging:
+  # Log orientation every N callbacks
+  orientation_log_interval: 20  # Log every 20 IMU callbacks (~5 Hz)
+
+  # Log warnings for low confidence
+  warn_low_confidence: true
+  confidence_warn_threshold: 0.7
+
+# Calibration Procedure Notes
+# ============================
+#
+# 1. Gyroscope Bias Calibration:
+#    - Place robot on stable surface
+#    - Run: ros2 run sensor_fusion_package calibrate_gyro
+#    - Wait 30 seconds
+#    - Copy output values to gyroscope_bias above
+#
+# 2. Accelerometer Calibration:
+#    - Place robot in 6 orientations (+X, -X, +Y, -Y, +Z, -Z)
+#    - Record readings in each orientation
+#    - Calculate scale and offset using least squares
+#
+# 3. Complementary Filter Tuning:
+#    - Alpha = 0.95: Balanced (good starting point)
+#    - Alpha = 0.98: Trust gyro more (faster response, slight drift)
+#    - Alpha = 0.90: Trust accel more (slower response, less drift)
+#    - Adjust based on application requirements
+#
+# 4. Verification:
+#    - Run test suite: python3 tests/test_calibration.py
+#    - Check that all tests pass
+#    - Manually verify orientation matches physical pose

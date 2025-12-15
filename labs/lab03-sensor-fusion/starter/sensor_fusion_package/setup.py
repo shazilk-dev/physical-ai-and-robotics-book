@@ -1,6 +1,8 @@
 from setuptools import setup
+import os
+from glob import glob
 
-package_name = 'heartbeat_package'
+package_name = 'sensor_fusion_package'
 
 setup(
     name=package_name,
@@ -13,14 +15,14 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='Student Name',
-    maintainer_email='student@example.com',
-    description='Lab 1: Heartbeat Publisher - ROS 2 Basics',
-    license='Apache-2.0',
+    maintainer='Student',
+    maintainer_email='student@robotics.edu',
+    description='Lab 3: Sensor Fusion (IMU + RealSense Camera)',
+    license='MIT',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'heartbeat_node = heartbeat_package.heartbeat_node:main'
+            'sensor_fusion_node = sensor_fusion_package.sensor_fusion_node:main',
         ],
     },
 )

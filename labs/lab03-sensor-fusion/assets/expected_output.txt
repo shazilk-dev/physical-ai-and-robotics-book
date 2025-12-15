@@ -1,0 +1,253 @@
+Expected Terminal Output for Lab 3: Sensor Fusion
+================================================
+
+1. SUCCESSFUL NODE STARTUP
+---------------------------
+
+$ ros2 run sensor_fusion_package sensor_fusion_node
+
+[INFO] [1234567890.123456789] [sensor_fusion_node]: 🤖 Sensor Fusion Node Started
+[INFO] [1234567890.124567890] [sensor_fusion_node]:    ✓ IMU subscriber: /imu/data
+[INFO] [1234567890.125678901] [sensor_fusion_node]:    ✓ Depth subscriber: /camera/depth/image_rect_raw
+[INFO] [1234567890.126789012] [sensor_fusion_node]:    ✓ State publisher: /robot/state (50Hz)
+[INFO] [1234567890.127890123] [sensor_fusion_node]:    ✓ Obstacle publisher: /robot/obstacles
+
+
+2. NORMAL OPERATION (Robot Stationary)
+---------------------------------------
+
+[INFO] [1234567890.323456789] [sensor_fusion_node]: Orientation: Roll=  +0.2°, Pitch=  -0.1°, Yaw=  +0.0°
+[INFO] [1234567890.523456789] [sensor_fusion_node]: Orientation: Roll=  +0.3°, Pitch=  -0.2°, Yaw=  +0.0°
+[INFO] [1234567890.723456789] [sensor_fusion_node]: Orientation: Roll=  +0.1°, Pitch=  -0.1°, Yaw=  +0.0°
+[INFO] [1234567890.923456789] [sensor_fusion_node]: Orientation: Roll=  +0.2°, Pitch=   0.0°, Yaw=  +0.0°
+
+✓ Roll/pitch should oscillate around 0° when stationary
+✓ Values should be smooth (no sudden jumps)
+
+
+3. ROBOT TILTED (Roll Test)
+----------------------------
+
+# Tilt robot to the left (positive Y axis)
+
+[INFO] [1234567891.123456789] [sensor_fusion_node]: Orientation: Roll= +15.3°, Pitch=  -0.2°, Yaw=  +0.0°
+[INFO] [1234567891.323456789] [sensor_fusion_node]: Orientation: Roll= +15.5°, Pitch=  -0.1°, Yaw=  +0.0°
+[INFO] [1234567891.523456789] [sensor_fusion_node]: Orientation: Roll= +15.4°, Pitch=  -0.2°, Yaw=  +0.0°
+
+✓ Roll should be positive when tilted left
+✓ Pitch should remain near 0°
+
+
+4. ROBOT TILTED (Pitch Test)
+-----------------------------
+
+# Tilt robot forward (negative X axis)
+
+[INFO] [1234567892.123456789] [sensor_fusion_node]: Orientation: Roll=  +0.1°, Pitch= +12.7°, Yaw=  +0.0°
+[INFO] [1234567892.323456789] [sensor_fusion_node]: Orientation: Roll=  +0.2°, Pitch= +12.8°, Yaw=  +0.0°
+[INFO] [1234567892.523456789] [sensor_fusion_node]: Orientation: Roll=   0.0°, Pitch= +12.9°, Yaw=  +0.0°
+
+✓ Pitch should be positive when tilted forward
+✓ Roll should remain near 0°
+
+
+5. OBSTACLE DETECTION
+----------------------
+
+# Place object within 1 meter of camera
+
+[WARN] [1234567893.123456789] [sensor_fusion_node]: ⚠️  OBSTACLE at 0.65m
+[WARN] [1234567893.323456789] [sensor_fusion_node]: ⚠️  OBSTACLE at 0.63m
+[WARN] [1234567893.523456789] [sensor_fusion_node]: Low confidence: 0.80 (obstacle at 0.62m)
+[WARN] [1234567893.723456789] [sensor_fusion_node]: ⚠️  OBSTACLE at 0.60m
+
+✓ Should detect obstacles within 1 meter
+✓ Should publish on /robot/obstacles topic
+
+
+6. CHECKING PUBLISHED STATE
+----------------------------
+
+# In another terminal:
+$ ros2 topic echo /robot/state
+
+header:
+  stamp:
+    sec: 1234567890
+    nanosec: 123456789
+  frame_id: base_link
+pose:
+  position:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  orientation:
+    x: 0.003
+    y: -0.002
+    w: 0.999
+    z: 0.0
+---
+
+✓ Publishes at ~50 Hz
+✓ Quaternion magnitude ≈ 1.0
+✓ frame_id should be 'base_link'
+
+
+7. CHECKING TOPIC LIST
+-----------------------
+
+$ ros2 topic list
+
+/imu/data
+/camera/depth/image_rect_raw
+/camera/color/image_raw
+/robot/state
+/robot/obstacles
+/parameter_events
+/rosout
+
+✓ All expected topics are present
+
+
+8. CHECKING TOPIC INFO
+-----------------------
+
+$ ros2 topic info /robot/state
+
+Type: geometry_msgs/msg/PoseStamped
+Publisher count: 1
+Subscription count: 0
+
+$ ros2 topic hz /robot/state
+
+average rate: 50.123
+        min: 0.019s max: 0.021s std dev: 0.00043s window: 100
+
+✓ Publish rate should be ~50 Hz (±1 Hz)
+
+
+9. RUNNING AUTOMATED TESTS
+---------------------------
+
+$ cd ~/ros2_ws/src/sensor_fusion_package
+$ python3 ../../lab03-sensor-fusion/tests/test_sensor_fusion.py
+
+test_01_node_starts ... ✅ Node starts successfully
+ok
+test_02_imu_subscriber_exists ... ✅ IMU subscriber exists on /imu/data
+ok
+test_03_depth_subscriber_exists ... ✅ Depth subscriber exists
+ok
+test_04_state_publisher_exists ... ✅ State publisher exists on /robot/state
+ok
+test_05_publish_rate ... ✅ Publish rate: 50 Hz (target: 50 Hz)
+ok
+test_06_orientation_valid_range ... ✅ Orientation values valid: Roll=0.05, Pitch=-0.01, Yaw=0.00
+ok
+test_07_complementary_filter_smoothness ... ✅ Complementary filter smoothness: variance=0.000234
+ok
+test_08_quaternion_normalized ... ✅ Quaternion normalized: magnitude=1.000000
+ok
+test_09_obstacle_detection ... ✅ Obstacle detection works (distance=0.50m)
+ok
+
+======================================================================
+✅ ALL SENSOR FUSION TESTS PASSED!
+   - 9 tests run
+   - 0 failures
+   - 0 errors
+
+   Your sensor fusion implementation is correct!
+
+   Next steps:
+   1. Compare with solution: diff starter/ solutions/
+   2. Test with real hardware (RealSense D435i)
+   3. Try bonus challenges (EKF, magnetometer)
+======================================================================
+
+
+10. ERROR SCENARIOS
+-------------------
+
+A. Missing TODO Implementation:
+
+[ERROR] [1234567894.123456789] [sensor_fusion_node]: 'SensorFusionNode' object has no attribute 'imu_subscriber'
+
+→ Check TODO 1: Create IMU subscriber
+
+
+B. Incorrect Complementary Filter:
+
+[WARN] [1234567894.323456789] [sensor_fusion_node]: Orientation: Roll=+153.7°, Pitch= +87.3°, Yaw=  +0.0°
+
+→ Check TODO 5: Verify alpha value and filter equation
+
+
+C. Depth Processing Error:
+
+[ERROR] [1234567894.523456789] [sensor_fusion_node]: Depth processing failed: 'NoneType' object has no attribute 'shape'
+
+→ Check TODO 8: Verify cv_bridge conversion
+
+
+D. State Not Publishing:
+
+# ros2 topic echo /robot/state shows nothing
+
+→ Check TODO 10: Verify state_publisher is created
+→ Check TODO 11: Verify publish_state() is implemented
+
+
+11. PERFORMANCE METRICS
+------------------------
+
+Expected Performance:
+- IMU callback latency: <1ms
+- Depth callback latency: <10ms
+- State publish latency: <1ms
+- Total CPU usage: <5%
+- Memory usage: <50MB
+
+Monitor with:
+$ ros2 topic hz /robot/state
+$ ros2 topic bw /robot/state
+$ top -p $(pgrep -f sensor_fusion_node)
+
+
+12. DEBUGGING COMMANDS
+----------------------
+
+# Check if IMU data is being published
+$ ros2 topic echo /imu/data --once
+
+# Check if depth data is being published
+$ ros2 topic echo /camera/depth/image_rect_raw --once
+
+# View all active nodes
+$ ros2 node list
+
+# View node info
+$ ros2 node info /sensor_fusion_node
+
+# Record data for analysis
+$ ros2 bag record /imu/data /robot/state /robot/obstacles
+
+# Play back recorded data
+$ ros2 bag play <bag_file>
+
+
+13. SUCCESSFUL COMPLETION CHECKLIST
+------------------------------------
+
+✅ Node starts without errors
+✅ All topics are created
+✅ Publishes at 50 Hz
+✅ Orientation values are reasonable (±45° for small tilts)
+✅ Obstacle detection triggers at <1m
+✅ All 9 automated tests pass
+✅ Complementary filter produces smooth output
+✅ Quaternions are normalized (magnitude = 1.0)
+✅ No warnings about low confidence (unless obstacle is very close)
+✅ Performance is acceptable (<5% CPU)
+
+If all items are checked, you've successfully completed Lab 3! 🎉

@@ -1,0 +1,222 @@
+<?xml version="1.0"?>
+<!--
+Lab 2: Simplified Humanoid URDF - Starter Code
+Physical AI & Humanoid Robotics Textbook
+
+Complete the 10 TODOs to build a 7-DOF upper body humanoid robot.
+
+Robot Structure:
+- 1 Torso (base link)
+- 1 Head (connected via neck joint)
+- 2 Upper arms (connected via shoulder joints)
+- 2 Forearms (connected via elbow joints)
+
+Total: 6 links, 7 joints (1 neck + 2 shoulders + 2 elbows)
+-->
+
+<robot name="simple_humanoid">
+
+  <!-- ============================================================ -->
+  <!-- TORSO (BASE LINK) - Main body of the robot                  -->
+  <!-- ============================================================ -->
+
+  <link name="torso">
+
+    <!-- TODO 1: ADD VISUAL GEOMETRY FOR TORSO -->
+    <!-- Hint: Use <visual> tag with <geometry> containing a <box>
+         Box dimensions: size="0.3 0.2 0.4" (width depth height in meters)
+         Origin: xyz="0 0 0.2" (center of box is 0.2m above torso origin)
+         Material: <material name="blue">
+                     <color rgba="0.2 0.4 0.8 1.0"/>
+                   </material>
+    -->
+
+
+    <!-- TODO 2: ADD COLLISION GEOMETRY FOR TORSO -->
+    <!-- Hint: Use <collision> tag with same geometry as visual
+         Collision geometry is used for physics simulation
+         Usually identical to visual for simple shapes
+    -->
+
+
+    <!-- TODO 3: ADD INERTIAL PROPERTIES FOR TORSO -->
+    <!-- Hint: Use <inertial> tag with:
+         - <mass value="5.0"/> (5 kg torso)
+         - <origin xyz="0 0 0.2"/> (center of mass)
+         - <inertia ixx="0.05" ixy="0.0" ixz="0.0"
+                    iyy="0.06" iyz="0.0"
+                    izz="0.03"/> (inertia tensor for box)
+         Formula for box inertia: I_xx = (1/12) * m * (h² + d²)
+    -->
+
+  </link>
+
+
+  <!-- ============================================================ -->
+  <!-- HEAD - Mounted on top of torso                               -->
+  <!-- ============================================================ -->
+
+  <link name="head">
+
+    <!-- TODO 4: ADD HEAD GEOMETRY -->
+    <!-- Hint: Use sphere geometry for the head
+         <visual>
+           <origin xyz="0 0 0" rpy="0 0 0"/>
+           <geometry>
+             <sphere radius="0.075"/>  (7.5cm radius)
+           </geometry>
+           <material name="red">
+             <color rgba="0.8 0.2 0.2 1.0"/>
+           </material>
+         </visual>
+
+         Also add <collision> (same as visual)
+         Also add <inertial>:
+           <mass value="1.0"/>  (1 kg head)
+           <inertia ixx="0.001" ixy="0" ixz="0"
+                    iyy="0.001" iyz="0"
+                    izz="0.001"/>  (sphere inertia)
+    -->
+
+  </link>
+
+
+  <!-- TODO 5: ADD NECK JOINT (connects torso → head) -->
+  <!-- Hint: Joint definition structure:
+       <joint name="neck" type="revolute">
+         <parent link="torso"/>
+         <child link="head"/>
+         <origin xyz="0 0 0.45" rpy="0 0 0"/>  (on top of torso)
+         <axis xyz="0 0 1"/>  (Z-axis = yaw rotation)
+         <limit lower="-1.57" upper="1.57"  (±90° in radians)
+                effort="10.0"  (max torque in Nm)
+                velocity="2.0"/>  (max angular velocity in rad/s)
+       </joint>
+  -->
+
+
+
+  <!-- ============================================================ -->
+  <!-- LEFT ARM - Upper arm and forearm                             -->
+  <!-- ============================================================ -->
+
+  <!-- TODO 6: ADD LEFT UPPER ARM LINK -->
+  <!-- Hint: Cylinder geometry pointing downward
+       <link name="left_upper_arm">
+         <visual>
+           <origin xyz="0 0 -0.125" rpy="0 0 0"/>  (cylinder center)
+           <geometry>
+             <cylinder radius="0.03" length="0.25"/>  (3cm radius, 25cm long)
+           </geometry>
+           <material name="green">
+             <color rgba="0.2 0.8 0.2 1.0"/>
+           </material>
+         </visual>
+         <collision>
+           ... (same as visual)
+         </collision>
+         <inertial>
+           <mass value="1.0"/>
+           <origin xyz="0 0 -0.125"/>
+           <inertia ixx="0.005" ixy="0" ixz="0"
+                    iyy="0.005" iyz="0"
+                    izz="0.0005"/>
+         </inertial>
+       </link>
+  -->
+
+
+
+  <!-- TODO 7: ADD LEFT SHOULDER JOINT (2 DOF requires 2 joints!) -->
+  <!-- Shoulder has 2 degrees of freedom:
+       1. Shoulder pitch (forward/backward swing)
+       2. Shoulder roll (outward/inward swing)
+
+       IMPORTANT: URDF only allows 1 DOF per joint!
+       Solution: Use 2 joints connected by a virtual link
+
+       Hint: Create structure:
+       torso → [shoulder_pitch joint] → left_shoulder_virtual_link → [shoulder_roll joint] → left_upper_arm
+
+       <link name="left_shoulder_virtual_link">
+         (invisible link, no geometry needed)
+       </link>
+
+       <joint name="left_shoulder_pitch" type="revolute">
+         <parent link="torso"/>
+         <child link="left_shoulder_virtual_link"/>
+         <origin xyz="0 0.15 0.35" rpy="0 0 0"/>  (left side of torso)
+         <axis xyz="1 0 0"/>  (X-axis = pitch)
+         <limit lower="-0.785" upper="3.14"  (-45° to +180°)
+                effort="20.0" velocity="2.0"/>
+       </joint>
+
+       <joint name="left_shoulder_roll" type="revolute">
+         <parent link="left_shoulder_virtual_link"/>
+         <child link="left_upper_arm"/>
+         <origin xyz="0 0 0" rpy="0 0 0"/>
+         <axis xyz="0 1 0"/>  (Y-axis = roll)
+         <limit lower="0" upper="1.57"  (0° to +90°, outward only)
+                effort="20.0" velocity="2.0"/>
+       </joint>
+  -->
+
+
+
+  <!-- TODO 8: ADD LEFT FOREARM LINK -->
+  <!-- Hint: Similar to upper arm, but connected at elbow
+       <link name="left_forearm">
+         <visual>
+           <origin xyz="0 0 -0.125" rpy="0 0 0"/>
+           <geometry>
+             <cylinder radius="0.025" length="0.25"/>  (slightly thinner)
+           </geometry>
+           <material name="green">
+             <color rgba="0.2 0.8 0.2 1.0"/>
+           </material>
+         </visual>
+         <collision> ... </collision>
+         <inertial>
+           <mass value="0.8"/>  (lighter than upper arm)
+           ...
+         </inertial>
+       </link>
+  -->
+
+
+
+  <!-- TODO 9: ADD LEFT ELBOW JOINT -->
+  <!-- Hint: Connects left_upper_arm → left_forearm
+       <joint name="left_elbow" type="revolute">
+         <parent link="left_upper_arm"/>
+         <child link="left_forearm"/>
+         <origin xyz="0 0 -0.25" rpy="0 0 0"/>  (at end of upper arm)
+         <axis xyz="1 0 0"/>  (X-axis = pitch)
+         <limit lower="0" upper="2.356"  (0° to +135°, bend inward only)
+                effort="15.0" velocity="2.0"/>
+       </joint>
+  -->
+
+
+
+  <!-- ============================================================ -->
+  <!-- RIGHT ARM - Mirror of left arm                               -->
+  <!-- ============================================================ -->
+
+  <!-- TODO 10: ADD RIGHT ARM (mirror left arm) -->
+  <!-- Hint: Copy left arm structure and change:
+       1. All "left" → "right" in names
+       2. Y-coordinates: Change sign (0.15 → -0.15 for shoulder position)
+       3. Shoulder roll limits: 0 to +90° becomes -90° to 0° (lower="-1.57" upper="0")
+
+       Right arm structure:
+       - right_upper_arm (link)
+       - right_shoulder_virtual_link (link)
+       - right_shoulder_pitch (joint, origin xyz="0 -0.15 0.35")
+       - right_shoulder_roll (joint, limits: lower="-1.57" upper="0")
+       - right_forearm (link)
+       - right_elbow (joint)
+  -->
+
+
+</robot>

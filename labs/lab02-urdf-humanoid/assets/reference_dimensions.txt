@@ -1,0 +1,69 @@
+Reference Dimensions for Lab 2 Humanoid URDF
+==============================================
+
+Link Dimensions:
+----------------
+
+Torso (base link):
+- Shape: Box
+- Size: 0.3m × 0.2m × 0.4m (W × D × H)
+- Mass: 5.0 kg
+- Origin: Center at (0, 0, 0.2) - 0.2m above ground
+
+Head:
+- Shape: Sphere
+- Radius: 0.075m (7.5cm)
+- Mass: 1.0 kg
+- Mounted at: (0, 0, 0.45) on top of torso
+
+Left Upper Arm:
+- Shape: Cylinder
+- Radius: 0.03m (3cm)
+- Length: 0.25m
+- Mass: 1.0 kg
+- Origin: Cylinder center at (0, 0, -0.125)
+
+Left Forearm:
+- Shape: Cylinder
+- Radius: 0.025m (2.5cm, slightly thinner)
+- Length: 0.25m
+- Mass: 0.8 kg
+- Origin: Cylinder center at (0, 0, -0.125)
+
+Right Arm (mirror of left):
+- Same dimensions as left arm
+- Mounted on opposite side (Y-coordinate negated)
+
+Joint Positions:
+----------------
+
+Neck:
+- Parent: torso
+- Child: head
+- Position: (0, 0, 0.45) - top of torso
+
+Left Shoulder:
+- Parent: torso
+- Child: left_upper_arm (via virtual link)
+- Position: (0, 0.15, 0.35) - left side of upper torso
+
+Right Shoulder:
+- Parent: torso
+- Child: right_upper_arm (via virtual link)
+- Position: (0, -0.15, 0.35) - right side of upper torso
+
+Left Elbow:
+- Parent: left_upper_arm
+- Child: left_forearm
+- Position: (0, 0, -0.25) - end of upper arm
+
+Right Elbow:
+- Parent: right_upper_arm
+- Child: right_forearm
+- Position: (0, 0, -0.25) - end of upper arm
+
+Total Robot Reach:
+------------------
+- Arm length: 0.25m (upper) + 0.25m (forearm) = 0.5m per arm
+- Total width (arms extended): ~1.3m (0.15 shoulder offset × 2 + 0.5m arm × 2)
+- Height: 0.45m (torso top) + 0.075m (head radius) ≈ 0.53m

@@ -1,0 +1,26 @@
+Expected Joint Ranges for Lab 2 Humanoid URDF
+==============================================
+
+Joint Name               | Lower Limit | Upper Limit | Range     | Axis
+-------------------------|-------------|-------------|-----------|-------
+neck                     | -90°        | +90°        | 180°      | Z (yaw)
+left_shoulder_pitch      | -45°        | +180°       | 225°      | X (pitch)
+left_shoulder_roll       | 0°          | +90°        | 90°       | Y (roll)
+left_elbow               | 0°          | +135°       | 135°      | X (pitch)
+right_shoulder_pitch     | -45°        | +180°       | 225°      | X (pitch)
+right_shoulder_roll      | -90°        | 0°          | 90°       | Y (roll)
+right_elbow              | 0°          | +135°       | 135°      | X (pitch)
+
+Notes:
+- All angles in degrees (convert to radians in URDF: multiply by π/180)
+- Left shoulder roll: 0° = arm at side, +90° = arm straight out (Y-axis)
+- Right shoulder roll: 0° = arm at side, -90° = arm straight out (mirrored)
+- Elbows: 0° = fully extended, +135° = bent inward
+- Total DOF: 7 (1 neck + 6 arm joints)
+
+Conversion Table:
+-45° = -0.785 rad
+0° = 0.0 rad
++90° = +1.57 rad
++135° = +2.356 rad
++180° = +3.14 rad (π)

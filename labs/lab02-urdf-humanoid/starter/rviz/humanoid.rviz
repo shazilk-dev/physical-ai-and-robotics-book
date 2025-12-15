@@ -1,0 +1,56 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+  - Class: rviz_common/Views
+    Name: Views
+
+Visualization Manager:
+  Displays:
+    - Class: rviz_common/Grid
+      Name: Grid
+      Plane: XY
+      Color: 160; 160; 164
+      Line Style:
+        Line Width: 0.03
+        Value: Lines
+      Cell Size: 0.5
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+
+    - Class: rviz_default_plugins/TF
+      Name: TF
+      Show Axes: true
+      Show Names: true
+      Frame Timeout: 15.0
+      Marker Scale: 0.3
+
+    - Class: rviz_default_plugins/RobotModel
+      Name: RobotModel
+      Description Topic: /robot_description
+      Visual Enabled: true
+      Collision Enabled: false
+      Alpha: 1.0
+
+  Global Options:
+    Background Color: 48; 48; 48
+    Fixed Frame: torso
+    Frame Rate: 30
+
+  Tools:
+    - Class: rviz_default_plugins/Interact
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Select
+
+  Value: true
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 1.5
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 0.3
+      Pitch: 0.5
+      Yaw: 0.8
