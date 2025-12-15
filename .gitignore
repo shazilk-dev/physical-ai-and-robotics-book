@@ -39,6 +39,12 @@ docs/.cache/
 .env.local
 .env.*.local
 
+# Sensitive files
+keys.md
+*.key
+*.pem
+secrets.txt
+
 # Docker
 docker-compose.override.yml
 
