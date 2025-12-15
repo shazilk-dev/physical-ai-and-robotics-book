@@ -44,6 +44,11 @@ const config: Config = {
     locales: ["en"],
   },
 
+  // Custom fields for runtime configuration
+  customFields: {
+    apiUrl: process.env.DOCUSAURUS_API_URL || 'https://physical-ai-and-robotics-book.onrender.com/api/v1',
+  },
+
   markdown: {
     mermaid: true,
   },

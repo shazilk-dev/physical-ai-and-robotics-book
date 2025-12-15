@@ -41,11 +41,23 @@ interface Message {
   timestamp: Date;
 }
 
-// Backend API URL - defaults to localhost if not deployed
-const API_URL =
-  process.env.NODE_ENV === "production"
-    ? process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"
-    : "http://localhost:8000/api/v1";
+// Backend API URL - detect environment safely in browser
+const getApiUrl = () => {
+  // Check if we have a custom API URL set (from environment variables)
+  if (typeof window !== 'undefined' && (window as any).docusaurus?.siteConfig?.customFields?.apiUrl) {
+    return (window as any).docusaurus.siteConfig.customFields.apiUrl;
+  }
+
+  // Check if running on production domain
+  if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
+    return 'https://physical-ai-and-robotics-book.onrender.com/api/v1';
+  }
+
+  // Default to localhost for development
+  return 'http://localhost:8000/api/v1';
+};
+
+const API_URL = getApiUrl();
 
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
