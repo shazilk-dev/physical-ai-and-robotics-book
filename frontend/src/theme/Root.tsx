@@ -1,18 +1,17 @@
 /**
  * Root Theme Wrapper
- * Adds ChatWidget to all pages
+ * Adds ChatWidget to all pages (client-side only)
  */
 
 import React from "react";
 import ChatWidget from "@site/src/components/ChatWidget/ChatWidget";
-import ExecutionEnvironment from "@docusaurus/ExecutionEnvironment";
 
 export default function Root({ children }) {
   return (
     <>
       {children}
-      {/* Only render ChatWidget in browser */}
-      {ExecutionEnvironment.canUseDOM && <ChatWidget />}
+      {/* ChatWidget handles its own SSR check */}
+      <ChatWidget />
     </>
   );
 }
