@@ -19,8 +19,8 @@ const config: Config = {
     ? `https://${process.env.VERCEL_URL}`
     : "https://shazilk-dev.github.io",
   // Set the /<baseUrl>/ pathname under which your site is served
-  // For Vercel, use "/" (root). For GitHub Pages, use "/<projectName>/"
-  baseUrl: process.env.VERCEL ? "/" : "/physical-ai-and-robotics-book/",
+  // For Vercel, always use "/" (root). For GitHub Pages, use "/<projectName>/"
+  baseUrl: "/",
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
