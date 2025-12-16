@@ -194,6 +194,173 @@ Please provide a clear, educational answer based on the context above. Include s
             print(f"❌ Error in query method: {e}")
             raise
 
+    def contextual_query(
+        self,
+        question: str,
+        selected_text: str,
+        action: str,
+        module: str = None,
+        num_results: int = 5
+    ) -> Dict[str, Any]:
+        """
+        Enhanced query with text selection context
+
+        Args:
+            question: User's question (may be auto-generated)
+            selected_text: The text user selected from the document
+            action: The action type (explain, simplify, example, quiz)
+            module: Optional module filter
+            num_results: Number of results to retrieve
+
+        Returns:
+            Query response dict with answer, sources, and citations
+        """
+        try:
+            print(f"🎯 Contextual Query:")
+            print(f"   Selected: {selected_text[:50]}...")
+            print(f"   Action: {action}")
+
+            # Step 1: Search for relevant chunks (use selected text for better search)
+            relevant_chunks = self.search_similar_chunks(
+                query=selected_text,  # Use selected text for semantic search
+                limit=num_results,
+                module=module
+            )
+
+            if not relevant_chunks:
+                return {
+                    "answer": f"I couldn't find information about '{selected_text}' in the textbook. Could you try selecting a different concept?",
+                    "sources": [],
+                    "citations": [],
+                    "action": action
+                }
+
+            # Step 2: Generate action-specific response
+            response = self.generate_contextual_response(
+                question=question,
+                selected_text=selected_text,
+                action=action,
+                context_chunks=relevant_chunks
+            )
+
+            response["action"] = action
+            return response
+
+        except Exception as e:
+            print(f"❌ Error in contextual_query: {e}")
+            raise
+
+    def generate_contextual_response(
+        self,
+        question: str,
+        selected_text: str,
+        action: str,
+        context_chunks: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        """Generate response adapted to the selected action"""
+
+        # Build context from retrieved chunks
+        context = "\n\n".join([
+            f"[Source: {chunk['section']}]\n{chunk['content']}"
+            for chunk in context_chunks
+        ])
+
+        # Get action-specific system prompt
+        action_prompts = {
+            "explain": """You are an expert robotics tutor. The student selected a concept
+from the textbook and wants a clear explanation.
+
+INSTRUCTIONS:
+- Provide a comprehensive, clear explanation
+- Use analogies and real-world examples
+- Break down complex concepts into digestible parts
+- Include technical details but make them accessible
+- If relevant, mention how it connects to other concepts
+- Use bullet points or numbered lists for clarity
+""",
+
+            "simplify": """You are an expert at explaining complex concepts simply.
+The student found a concept confusing and needs it explained in easier terms.
+
+INSTRUCTIONS:
+- Use the SIMPLEST language possible (avoid jargon)
+- Use everyday analogies and metaphors
+- Break it down into the most basic components
+- Imagine explaining to someone with NO technical background
+- Use comparisons to familiar, everyday things
+- Keep paragraphs short (2-3 sentences max)
+- If you must use a technical term, define it immediately
+""",
+
+            "example": """You are a practical robotics instructor. The student wants to see
+how a concept works in practice.
+
+INSTRUCTIONS:
+- Provide a CONCRETE, working code example
+- Show a complete, runnable snippet (not just fragments)
+- Include comments explaining each part
+- Show expected output or behavior
+- Mention common pitfalls or mistakes
+- If applicable, show how to test or verify it works
+- Keep the example focused on the selected concept
+""",
+
+            "quiz": """You are a patient tutor creating quiz questions. The student wants to test
+their understanding of a concept.
+
+INSTRUCTIONS:
+- Create 2-3 questions of varying difficulty (easy → medium)
+- Start with: "Let's test your understanding of [concept]!"
+- Use multiple formats: multiple choice, fill-in-blank, or short answer
+- For each question:
+  * State the question clearly
+  * If multiple choice, give 3-4 options
+  * Wait for the student's answer (don't provide answers yet)
+- Keep questions focused on UNDERSTANDING, not memorization
+- Phrase questions to check conceptual grasp, not just definitions
+"""
+        }
+
+        system_prompt = action_prompts.get(action, action_prompts["explain"])
+
+        # Build user prompt with all context
+        user_prompt = f"""The student is reading about Physical AI and Robotics.
+
+They selected this text from the document:
+"{selected_text}"
+
+Relevant content from the textbook:
+{context}
+
+Student's question: {question}
+
+Respond according to your instructions."""
+
+        # Generate response
+        response = self.openai_client.chat.completions.create(
+            model=self.chat_model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            temperature=0.7,
+            max_tokens=1500  # Increase for examples and detailed explanations
+        )
+
+        answer = response.choices[0].message.content
+
+        # Extract citations
+        citations = list(set([
+            chunk['section'] for chunk in context_chunks
+        ]))
+
+        return {
+            "answer": answer,
+            "sources": context_chunks,
+            "citations": citations,
+            "model": self.chat_model
+        }
+
 
 # Singleton instance
 _rag_service = None

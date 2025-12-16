@@ -16,6 +16,15 @@ class QueryRequest(BaseModel):
     num_results: Optional[int] = 5
 
 
+class ContextualQueryRequest(BaseModel):
+    """Request model for contextual RAG query with text selection"""
+    question: str
+    selected_text: Optional[str] = None  # Text user selected from the document
+    action: Optional[str] = None  # explain, simplify, example, quiz
+    module: Optional[str] = None
+    num_results: Optional[int] = 5
+
+
 class SourceChunk(BaseModel):
     """Source chunk model"""
     content: str
@@ -76,6 +85,69 @@ async def query_rag(request: QueryRequest):
         raise HTTPException(
             status_code=500,
             detail=f"Error processing query: {str(e)}"
+        )
+
+
+@router.post("/query/contextual", response_model=QueryResponse)
+async def query_rag_contextual(request: ContextualQueryRequest):
+    """
+    Enhanced query endpoint with text selection context
+
+    **Example Request:**
+    ```json
+    {
+        "question": "Explain this concept: 'pub/sub pattern'",
+        "selected_text": "pub/sub pattern",
+        "action": "explain",
+        "num_results": 5
+    }
+    ```
+
+    **Actions:**
+    - **explain**: Clear, comprehensive explanation
+    - **simplify**: Simplified explanation with analogies
+    - **example**: Practical code examples
+    - **quiz**: Generate quiz questions to test understanding
+
+    **Example Response:**
+    ```json
+    {
+        "answer": "The pub/sub pattern in ROS 2 works like...",
+        "sources": [...],
+        "citations": ["1.1.1", "1.1.2"],
+        "model": "gpt-4o-mini"
+    }
+    ```
+    """
+    try:
+        rag_service = get_rag_service()
+
+        # Use contextual query method if selection context provided
+        if request.selected_text and request.action:
+            result = rag_service.contextual_query(
+                question=request.question,
+                selected_text=request.selected_text,
+                action=request.action,
+                module=request.module,
+                num_results=request.num_results
+            )
+        else:
+            # Fall back to regular query
+            result = rag_service.query(
+                question=request.question,
+                module=request.module,
+                num_results=request.num_results
+            )
+
+        return QueryResponse(**result)
+
+    except Exception as e:
+        import traceback
+        error_detail = traceback.format_exc()
+        print(f"❌ Contextual RAG Query Error: {error_detail}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error processing contextual query: {str(e)}"
         )
 
 

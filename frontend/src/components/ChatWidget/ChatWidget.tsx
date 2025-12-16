@@ -1,6 +1,7 @@
 /**
  * ChatWidget Component - Modernized Professional UI
  * RAG-powered Q&A interface with Lucide icons
+ * Enhanced with text selection and contextual queries
  */
 
 import React, { useState, useRef, useEffect } from "react";
@@ -15,6 +16,7 @@ import {
   Loader2,
 } from "lucide-react";
 import styles from "./ChatWidget.module.css";
+import SelectionMenu, { SelectionContext } from "../SelectionMenu/SelectionMenu";
 
 interface Source {
   content: string;
@@ -31,6 +33,14 @@ interface QueryResponse {
   sources: Source[];
   citations: string[];
   model?: string;
+  action?: string; // Track which action was used
+}
+
+interface ContextualQueryRequest {
+  question: string;
+  selected_text?: string;
+  action?: string;
+  num_results?: number;
 }
 
 interface Message {
@@ -73,6 +83,7 @@ export default function ChatWidget() {
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [selectionContext, setSelectionContext] = useState<SelectionContext | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -87,6 +98,35 @@ export default function ChatWidget() {
       inputRef.current?.focus();
     }
   }, [isOpen]);
+
+  // Handle text selection actions
+  const handleSelectionAction = (context: SelectionContext) => {
+    // Open chat if closed
+    if (!isOpen) {
+      setIsOpen(true);
+    }
+
+    // Generate appropriate question based on action
+    const prompts = {
+      explain: `Explain this concept: "${context.text}"`,
+      simplify: `Explain this in simpler terms: "${context.text}"`,
+      example: `Give me a practical example of: "${context.text}"`,
+      quiz: `Quiz me on this concept: "${context.text}"`,
+    };
+
+    // Set the input with the generated prompt
+    setInputValue(prompts[context.action]);
+    setSelectionContext(context);
+
+    // Auto-submit the query after a brief delay (to show the prompt)
+    setTimeout(() => {
+      // Trigger form submission programmatically
+      const form = document.querySelector(`.${styles.inputForm}`) as HTMLFormElement;
+      if (form) {
+        form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+      }
+    }, 500);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,15 +144,24 @@ export default function ChatWidget() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/query`, {
+      // Build request payload with optional selection context
+      const requestPayload: ContextualQueryRequest = {
+        question: userMessage.content,
+        num_results: 5,
+      };
+
+      // Add selection context if available
+      if (selectionContext) {
+        requestPayload.selected_text = selectionContext.text;
+        requestPayload.action = selectionContext.action;
+      }
+
+      const response = await fetch(`${API_URL}/query/contextual`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          question: userMessage.content,
-          num_results: 5,
-        }),
+        body: JSON.stringify(requestPayload),
       });
 
       if (!response.ok) {
@@ -130,6 +179,9 @@ export default function ChatWidget() {
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
+
+      // Clear selection context after successful query
+      setSelectionContext(null);
     } catch (error) {
       console.error("Query error:", error);
 
@@ -220,6 +272,9 @@ export default function ChatWidget() {
 
   return (
     <>
+      {/* Text Selection Menu */}
+      <SelectionMenu onAction={handleSelectionAction} />
+
       {/* Floating Button */}
       <button
         className={`${styles.floatingButton} ${isOpen ? styles.open : ""}`}
