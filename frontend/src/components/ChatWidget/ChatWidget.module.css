@@ -102,6 +102,33 @@
   font-weight: 400;
 }
 
+/* Header Buttons Container */
+.headerButtons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settingsButton {
+  background: var(--ifm-color-emphasis-100);
+  border: none;
+  color: var(--ifm-color-emphasis-700);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.settingsButton:hover {
+  background: var(--ifm-color-emphasis-200);
+  color: var(--ifm-color-emphasis-900);
+  transform: rotate(45deg);
+}
+
 .closeButton {
   background: var(--ifm-color-emphasis-100);
   border: none;

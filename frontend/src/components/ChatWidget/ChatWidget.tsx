@@ -14,9 +14,12 @@ import {
   BookOpen,
   AlertCircle,
   Loader2,
+  Settings,
 } from "lucide-react";
 import styles from "./ChatWidget.module.css";
 import SelectionMenu, { SelectionContext } from "../SelectionMenu/SelectionMenu";
+import ChatSettingsPanel from "./ChatSettingsPanel";
+import { ChatSettings, DEFAULT_SETTINGS } from "./types";
 
 interface Source {
   content: string;
@@ -41,6 +44,7 @@ interface ContextualQueryRequest {
   selected_text?: string;
   action?: string;
   num_results?: number;
+  settings?: ChatSettings; // Include user preferences
 }
 
 interface Message {
@@ -87,6 +91,8 @@ export default function ChatWidget() {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState<string>("Thinking...");
   const [selectionContext, setSelectionContext] = useState<SelectionContext | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
+  const [settings, setSettings] = useState<ChatSettings>(DEFAULT_SETTINGS);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -101,6 +107,27 @@ export default function ChatWidget() {
       inputRef.current?.focus();
     }
   }, [isOpen]);
+
+  // Load settings from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedSettings = localStorage.getItem('chatSettings');
+      if (savedSettings) {
+        setSettings(JSON.parse(savedSettings));
+      }
+    } catch (error) {
+      console.error('Failed to load chat settings:', error);
+    }
+  }, []);
+
+  // Save settings to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('chatSettings', JSON.stringify(settings));
+    } catch (error) {
+      console.error('Failed to save chat settings:', error);
+    }
+  }, [settings]);
 
   // Handle text selection actions
   const handleSelectionAction = (context: SelectionContext) => {
@@ -162,10 +189,11 @@ export default function ChatWidget() {
     );
 
     try {
-      // Build request payload with optional selection context
+      // Build request payload with optional selection context and settings
       const requestPayload: ContextualQueryRequest = {
         question: userMessage.content,
         num_results: 5,
+        settings: settings, // Include user preferences
       };
 
       // Add selection context if available
@@ -346,6 +374,15 @@ export default function ChatWidget() {
       {/* Text Selection Menu */}
       <SelectionMenu onAction={handleSelectionAction} />
 
+      {/* Settings Panel */}
+      {showSettings && (
+        <ChatSettingsPanel
+          settings={settings}
+          onUpdate={setSettings}
+          onClose={() => setShowSettings(false)}
+        />
+      )}
+
       {/* Floating Button */}
       <button
         className={`${styles.floatingButton} ${isOpen ? styles.open : ""}`}
@@ -370,13 +407,23 @@ export default function ChatWidget() {
                 <div className={styles.headerSubtitle}>Physical AI Book</div>
               </div>
             </div>
-            <button
-              className={styles.closeButton}
-              onClick={() => setIsOpen(false)}
-              aria-label="Close chat"
-            >
-              <X size={20} />
-            </button>
+            <div className={styles.headerButtons}>
+              <button
+                className={styles.settingsButton}
+                onClick={() => setShowSettings(true)}
+                aria-label="Open settings"
+                title="Customize response style"
+              >
+                <Settings size={20} />
+              </button>
+              <button
+                className={styles.closeButton}
+                onClick={() => setIsOpen(false)}
+                aria-label="Close chat"
+              >
+                <X size={20} />
+              </button>
+            </div>
           </div>
 
           <div className={styles.messagesContainer}>

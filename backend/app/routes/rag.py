@@ -16,13 +16,23 @@ class QueryRequest(BaseModel):
     num_results: Optional[int] = 5
 
 
+class ChatSettings(BaseModel):
+    """User's response style preferences"""
+    responseMode: Optional[str] = 'detailed'  # quick, detailed, tutorial, socratic
+    explanationDepth: Optional[int] = 3  # 1-5 scale
+    includeCodeExamples: Optional[bool] = True
+    includeVisuals: Optional[bool] = True
+    languageStyle: Optional[str] = 'casual'  # casual, formal, technical
+
+
 class ContextualQueryRequest(BaseModel):
-    """Request model for contextual RAG query with text selection"""
+    """Request model for contextual RAG query with text selection and settings"""
     question: str
     selected_text: Optional[str] = None  # Text user selected from the document
     action: Optional[str] = None  # explain, simplify, example, quiz
     module: Optional[str] = None
     num_results: Optional[int] = 5
+    settings: Optional[ChatSettings] = None  # User's response style preferences
 
     class Config:
         json_schema_extra = {
@@ -30,7 +40,14 @@ class ContextualQueryRequest(BaseModel):
                 "question": "Explain this concept: 'pub/sub pattern'",
                 "selected_text": "pub/sub pattern",
                 "action": "explain",
-                "num_results": 5
+                "num_results": 5,
+                "settings": {
+                    "responseMode": "detailed",
+                    "explanationDepth": 3,
+                    "includeCodeExamples": True,
+                    "includeVisuals": True,
+                    "languageStyle": "casual"
+                }
             }
         }
 
@@ -161,9 +178,17 @@ async def query_rag_contextual(request: ContextualQueryRequest):
             print(f"   Selected: {request.selected_text[:50]}...")
         if request.action:
             print(f"   Action: {request.action}")
+        if request.settings:
+            print(f"   Response Mode: {request.settings.responseMode}")
+            print(f"   Depth: {request.settings.explanationDepth}")
         print(f"{'='*60}\n")
 
         rag_service = get_rag_service()
+
+        # Convert settings to dict if provided
+        settings_dict = None
+        if request.settings:
+            settings_dict = request.settings.model_dump()
 
         # Use contextual query method if selection context provided
         if request.selected_text and request.action:
@@ -172,7 +197,8 @@ async def query_rag_contextual(request: ContextualQueryRequest):
                 selected_text=request.selected_text,
                 action=request.action,
                 module=request.module,
-                num_results=request.num_results
+                num_results=request.num_results,
+                settings=settings_dict  # Pass user settings
             )
         else:
             # Fall back to regular query
