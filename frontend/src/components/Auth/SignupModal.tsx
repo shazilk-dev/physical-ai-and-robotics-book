@@ -96,7 +96,21 @@ export default function SignupModal({
       }
 
       // Update profile with background questions
-      const BACKEND_URL = "http://localhost:8000";
+      // Use the same backend URL detection as auth-client
+      const getBackendUrl = () => {
+        if (typeof window !== 'undefined' && (window as any).docusaurus?.siteConfig?.customFields?.apiUrl) {
+          const apiUrl = (window as any).docusaurus.siteConfig.customFields.apiUrl;
+          return apiUrl.replace('/api/v1', '');
+        }
+        if (typeof window !== 'undefined' &&
+            (window.location.hostname.includes('vercel.app') ||
+             window.location.hostname.includes('physical-ai-robotics-book'))) {
+          return 'https://physical-ai-and-robotics-book.onrender.com';
+        }
+        return 'http://localhost:8000';
+      };
+
+      const BACKEND_URL = getBackendUrl();
       const profileResponse = await fetch(
         `${BACKEND_URL}/api/auth/user/update-profile`,
         {
