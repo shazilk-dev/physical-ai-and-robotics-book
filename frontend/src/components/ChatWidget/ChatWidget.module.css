@@ -501,3 +501,142 @@
 [data-theme="dark"] .floatingButton {
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
 }
+
+/* Action Badge - Shows which action was used */
+.actionBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  animation: badgeFadeIn 0.3s ease-out;
+}
+
+@keyframes badgeFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.badgeIcon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.badgeLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Selected Text Indicator - Shows what text was selected */
+.selectedTextIndicator {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 12px;
+  background: rgba(102, 126, 234, 0.08);
+  border-left: 3px solid #667eea;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.selectedTextLabel {
+  font-weight: 600;
+  color: #667eea;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.selectedTextContent {
+  color: #4a5568;
+  font-style: italic;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+/* Dark mode support for new elements */
+@media (prefers-color-scheme: dark) {
+  .selectedTextIndicator {
+    background: rgba(102, 126, 234, 0.15);
+    border-left-color: #818cf8;
+  }
+
+  .selectedTextLabel {
+    color: #818cf8;
+  }
+
+  .selectedTextContent {
+    color: #cbd5e0;
+  }
+}
+
+/* Mobile optimizations for new elements */
+@media (max-width: 768px) {
+  .actionBadge {
+    font-size: 10px;
+    padding: 3px 8px;
+    gap: 4px;
+  }
+
+  .badgeIcon {
+    font-size: 12px;
+  }
+
+  .selectedTextIndicator {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .selectedTextLabel {
+    font-size: 10px;
+  }
+}
+
+/* Enhanced Loading State */
+.loadingText {
+  font-size: 13px;
+  color: #64748b;
+  font-style: italic;
+  margin-bottom: 8px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Dark mode for loading text */
+@media (prefers-color-scheme: dark) {
+  .loadingText {
+    color: #94a3b8;
+  }
+}

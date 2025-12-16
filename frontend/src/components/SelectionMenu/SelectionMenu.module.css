@@ -167,3 +167,46 @@
   -moz-user-select: none;
   -ms-user-select: none;
 }
+
+/* Keyboard Shortcut Indicator */
+.shortcut {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  color: #a0aec0;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 2px 4px;
+  border-radius: 3px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.menuButton {
+  position: relative; /* For absolute positioning of shortcut */
+}
+
+.menuButton:hover .shortcut {
+  opacity: 1;
+}
+
+/* Show shortcuts on hover of entire menu */
+.menuContent:hover .shortcut {
+  opacity: 0.7;
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .shortcut {
+    color: #cbd5e0;
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Hide shortcuts on mobile (no keyboard) */
+@media (max-width: 768px) {
+  .shortcut {
+    display: none;
+  }
+}

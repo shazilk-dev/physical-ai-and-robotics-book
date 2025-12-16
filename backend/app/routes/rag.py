@@ -24,6 +24,29 @@ class ContextualQueryRequest(BaseModel):
     module: Optional[str] = None
     num_results: Optional[int] = 5
 
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "question": "Explain this concept: 'pub/sub pattern'",
+                "selected_text": "pub/sub pattern",
+                "action": "explain",
+                "num_results": 5
+            }
+        }
+
+    # Validation
+    @classmethod
+    def validate_action(cls, v):
+        if v and v not in ['explain', 'simplify', 'example', 'quiz']:
+            raise ValueError(f"Invalid action: {v}. Must be one of: explain, simplify, example, quiz")
+        return v
+
+    @classmethod
+    def validate_selected_text(cls, v):
+        if v and (len(v) < 5 or len(v) > 1000):
+            raise ValueError("Selected text must be between 5 and 1000 characters")
+        return v
+
 
 class SourceChunk(BaseModel):
     """Source chunk model"""
@@ -119,7 +142,27 @@ async def query_rag_contextual(request: ContextualQueryRequest):
     }
     ```
     """
+    import time
+    start_time = time.time()
+
     try:
+        # Validate action if provided
+        if request.action:
+            request.validate_action(request.action)
+
+        # Validate selected text if provided
+        if request.selected_text:
+            request.validate_selected_text(request.selected_text)
+
+        print(f"\n{'='*60}")
+        print(f"📥 Contextual Query Request:")
+        print(f"   Question: {request.question[:80]}...")
+        if request.selected_text:
+            print(f"   Selected: {request.selected_text[:50]}...")
+        if request.action:
+            print(f"   Action: {request.action}")
+        print(f"{'='*60}\n")
+
         rag_service = get_rag_service()
 
         # Use contextual query method if selection context provided
@@ -139,15 +182,31 @@ async def query_rag_contextual(request: ContextualQueryRequest):
                 num_results=request.num_results
             )
 
+        # Log success
+        elapsed_time = (time.time() - start_time) * 1000
+        print(f"✅ Query completed in {elapsed_time:.0f}ms")
+        print(f"   Citations: {result.get('citations', [])}")
+        print(f"   Sources: {len(result.get('sources', []))}")
+
         return QueryResponse(**result)
 
+    except ValueError as ve:
+        # Validation error
+        print(f"⚠️  Validation Error: {str(ve)}")
+        raise HTTPException(
+            status_code=400,
+            detail=str(ve)
+        )
     except Exception as e:
         import traceback
         error_detail = traceback.format_exc()
-        print(f"❌ Contextual RAG Query Error: {error_detail}")
+        print(f"❌ Contextual RAG Query Error:")
+        print(error_detail)
+
+        # Don't expose internal errors to users
         raise HTTPException(
             status_code=500,
-            detail=f"Error processing contextual query: {str(e)}"
+            detail="An error occurred while processing your request. Please try again."
         )
 
 

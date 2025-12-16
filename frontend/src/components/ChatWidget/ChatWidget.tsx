@@ -49,6 +49,8 @@ interface Message {
   sources?: Source[];
   citations?: string[];
   timestamp: Date;
+  action?: "explain" | "simplify" | "example" | "quiz"; // Track which action was used
+  selectedText?: string; // Store the selected text for context
 }
 
 // Backend API URL - detect environment safely in browser
@@ -83,6 +85,7 @@ export default function ChatWidget() {
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState<string>("Thinking...");
   const [selectionContext, setSelectionContext] = useState<SelectionContext | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -137,11 +140,26 @@ export default function ChatWidget() {
       type: "user",
       content: inputValue.trim(),
       timestamp: new Date(),
+      action: selectionContext?.action,
+      selectedText: selectionContext?.text,
     };
 
     setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
     setIsLoading(true);
+
+    // Set contextual loading message
+    const loadingMessages = {
+      explain: "Preparing detailed explanation...",
+      simplify: "Simplifying the concept...",
+      example: "Generating code example...",
+      quiz: "Creating quiz questions...",
+    };
+    setLoadingMessage(
+      selectionContext?.action
+        ? loadingMessages[selectionContext.action]
+        : "Searching textbook..."
+    );
 
     try {
       // Build request payload with optional selection context
@@ -176,6 +194,7 @@ export default function ChatWidget() {
         sources: data.sources,
         citations: data.citations,
         timestamp: new Date(),
+        action: data.action || selectionContext?.action, // Store action from response or context
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
@@ -185,15 +204,29 @@ export default function ChatWidget() {
     } catch (error) {
       console.error("Query error:", error);
 
+      // Generate user-friendly error message
+      let errorContent = "Sorry, I encountered an issue. ";
+
+      if (error.message.includes("Failed to fetch") || error.message.includes("NetworkError")) {
+        errorContent += "I couldn't connect to the backend server. Please check your internet connection or try again later.";
+      } else if (error.message.includes("500")) {
+        errorContent += "The server encountered an error. Our team has been notified. Please try again in a moment.";
+      } else if (error.message.includes("404")) {
+        errorContent += "The requested endpoint wasn't found. This might be a deployment issue.";
+      } else {
+        errorContent += `${error.message}. Please try rephrasing your question or try again.`;
+      }
+
       const errorMessage: Message = {
         type: "error",
-        content: `Sorry, I couldn't process your question. ${error.message}. Make sure the backend server is running.`,
+        content: errorContent,
         timestamp: new Date(),
       };
 
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
+      setLoadingMessage("Thinking..."); // Reset loading message
     }
   };
 
@@ -206,9 +239,24 @@ export default function ChatWidget() {
     window.location.href = docPath;
   };
 
+  // Get action badge info
+  const getActionBadge = (action: Message["action"]) => {
+    if (!action) return null;
+
+    const badges = {
+      explain: { icon: "🤖", label: "Detailed Explanation", color: "#667eea" },
+      simplify: { icon: "📝", label: "Simplified", color: "#48bb78" },
+      example: { icon: "💡", label: "Code Example", color: "#f6ad55" },
+      quiz: { icon: "❓", label: "Quiz Mode", color: "#ed64a6" },
+    };
+
+    return badges[action];
+  };
+
   const renderMessage = (message: Message, index: number) => {
     const isUser = message.type === "user";
     const isError = message.type === "error";
+    const actionBadge = getActionBadge(message.action);
 
     return (
       <div
@@ -229,6 +277,29 @@ export default function ChatWidget() {
           )}
 
           <div className={styles.messageBody}>
+            {/* Show action badge for assistant messages */}
+            {!isUser && actionBadge && (
+              <div
+                className={styles.actionBadge}
+                style={{ backgroundColor: actionBadge.color }}
+              >
+                <span className={styles.badgeIcon}>{actionBadge.icon}</span>
+                <span className={styles.badgeLabel}>{actionBadge.label}</span>
+              </div>
+            )}
+
+            {/* Show selected text for user messages */}
+            {isUser && message.selectedText && (
+              <div className={styles.selectedTextIndicator}>
+                <span className={styles.selectedTextLabel}>Selected:</span>
+                <span className={styles.selectedTextContent}>
+                  "{message.selectedText.length > 80
+                    ? message.selectedText.substring(0, 77) + "..."
+                    : message.selectedText}"
+                </span>
+              </div>
+            )}
+
             <div className={styles.messageText}>{message.content}</div>
 
             {message.citations && message.citations.length > 0 && (
@@ -321,6 +392,9 @@ export default function ChatWidget() {
                     />
                   </div>
                   <div className={styles.messageBody}>
+                    <div className={styles.loadingText}>
+                      {loadingMessage}
+                    </div>
                     <div className={styles.loadingDots}>
                       <span></span>
                       <span></span>
