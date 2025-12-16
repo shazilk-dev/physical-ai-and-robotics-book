@@ -16,14 +16,31 @@ load_dotenv(Path(__file__).parent.parent.parent / ".env")
 class RAGService:
     def __init__(self):
         """Initialize RAG service with OpenAI and Qdrant clients"""
-        self.openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        self.qdrant_client = QdrantClient(
-            url=os.getenv("QDRANT_URL"),
-            api_key=os.getenv("QDRANT_API_KEY"),
-        )
+        # Validate environment variables
+        openai_key = os.getenv("OPENAI_API_KEY")
+        qdrant_url = os.getenv("QDRANT_URL")
+        qdrant_key = os.getenv("QDRANT_API_KEY")
+
+        if not openai_key:
+            raise ValueError("OPENAI_API_KEY environment variable is not set")
+        if not qdrant_url:
+            raise ValueError("QDRANT_URL environment variable is not set")
+        if not qdrant_key:
+            raise ValueError("QDRANT_API_KEY environment variable is not set")
+
+        print(f"🔧 Initializing RAG Service...")
+        print(f"   OpenAI Key: {'✅ Set' if openai_key else '❌ Missing'}")
+        print(f"   Qdrant URL: {qdrant_url[:30]}..." if qdrant_url else "❌ Missing")
+        print(f"   Qdrant Key: {'✅ Set' if qdrant_key else '❌ Missing'}")
+
+        self.openai_client = OpenAI(api_key=openai_key)
+        self.qdrant_client = QdrantClient(url=qdrant_url, api_key=qdrant_key)
         self.collection_name = os.getenv("QDRANT_COLLECTION_NAME", "physical_ai_book")
         self.embedding_model = "text-embedding-3-small"
         self.chat_model = "gpt-4o-mini"
+
+        print(f"   Collection: {self.collection_name}")
+        print(f"✅ RAG Service initialized")
         
     def create_collection(self):
         """Create Qdrant collection if it doesn't exist"""
@@ -49,28 +66,29 @@ class RAGService:
         return response.data[0].embedding
     
     def search_similar_chunks(
-        self, 
-        query: str, 
+        self,
+        query: str,
         limit: int = 5,
         module: str = None
     ) -> List[Dict[str, Any]]:
         """Search for similar content chunks"""
         query_vector = self.generate_embedding(query)
-        
+
         # Optional filter by module
         query_filter = None
         if module:
             query_filter = Filter(
                 must=[FieldCondition(key="module", match=MatchValue(value=module))]
             )
-        
-        search_result = self.qdrant_client.query_points(
+
+        # Use search() method for qdrant-client 1.7.3 compatibility
+        search_result = self.qdrant_client.search(
             collection_name=self.collection_name,
-            query=query_vector,
+            query_vector=query_vector,
             limit=limit,
             query_filter=query_filter
-        ).points
-        
+        )
+
         results = []
         for hit in search_result:
             results.append({
@@ -81,7 +99,7 @@ class RAGService:
                 "file_path": hit.payload.get("file_path"),
                 "score": hit.score
             })
-        
+
         return results
     
     def generate_response(
@@ -145,31 +163,36 @@ Please provide a clear, educational answer based on the context above. Include s
         }
     
     def query(
-        self, 
-        question: str, 
+        self,
+        question: str,
         module: str = None,
         num_results: int = 5
     ) -> Dict[str, Any]:
         """Main query method - search and generate answer"""
-        
-        # Step 1: Search for relevant chunks
-        relevant_chunks = self.search_similar_chunks(
-            query=question,
-            limit=num_results,
-            module=module
-        )
-        
-        if not relevant_chunks:
-            return {
-                "answer": "I couldn't find relevant information in the textbook for this question. Could you rephrase or ask about topics covered in Module 1 (ROS 2, URDF, Sensors)?",
-                "sources": [],
-                "citations": []
-            }
-        
-        # Step 2: Generate answer with context
-        response = self.generate_response(question, relevant_chunks)
-        
-        return response
+
+        try:
+            # Step 1: Search for relevant chunks
+            relevant_chunks = self.search_similar_chunks(
+                query=question,
+                limit=num_results,
+                module=module
+            )
+
+            if not relevant_chunks:
+                return {
+                    "answer": "I couldn't find relevant information in the textbook for this question. The vector database might be empty. Please ensure it has been seeded with content.",
+                    "sources": [],
+                    "citations": []
+                }
+
+            # Step 2: Generate answer with context
+            response = self.generate_response(question, relevant_chunks)
+
+            return response
+
+        except Exception as e:
+            print(f"❌ Error in query method: {e}")
+            raise
 
 
 # Singleton instance
