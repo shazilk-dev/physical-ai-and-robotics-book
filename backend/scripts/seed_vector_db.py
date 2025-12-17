@@ -18,6 +18,11 @@ import tiktoken
 from dotenv import load_dotenv
 import hashlib
 
+# Fix Windows console encoding for emojis
+if sys.platform == 'win32':
+    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8')
+
 # Load environment variables from .env file
 load_dotenv(Path(__file__).parent.parent / ".env")
 
@@ -255,20 +260,30 @@ def main():
         print(f"❌ Error: Directory not found: {docs_dir}")
         return
     
-    # Find all markdown files in module-01-ros2
-    module_dir = docs_dir / "module-01-ros2"
-    if not module_dir.exists():
-        print(f"❌ Error: Module directory not found: {module_dir}")
-        return
-    
-    markdown_files = list(module_dir.rglob("*.md"))
-    print(f"📋 Found {len(markdown_files)} markdown files")
-    
-    # Also include intro.md if it exists
-    intro_file = docs_dir / "intro.md"
-    if intro_file.exists():
-        markdown_files.append(intro_file)
-        print(f"📋 Including intro.md")
+    # Find all markdown files in ALL modules (recursively scan entire docs directory)
+    markdown_files = []
+
+    # Scan all module directories
+    for module_dir in docs_dir.glob("module-*"):
+        if module_dir.is_dir():
+            module_files = list(module_dir.rglob("*.md"))
+            markdown_files.extend(module_files)
+            print(f"📋 Found {len(module_files)} files in {module_dir.name}")
+
+    # Also include top-level files (intro.md, etc.)
+    for top_file in docs_dir.glob("*.md"):
+        if top_file.is_file():
+            markdown_files.append(top_file)
+            print(f"📋 Including {top_file.name}")
+
+    # Also include labs
+    labs_dir = docs_dir / "labs"
+    if labs_dir.exists():
+        lab_files = list(labs_dir.rglob("*.md"))
+        markdown_files.extend(lab_files)
+        print(f"📋 Found {len(lab_files)} files in labs")
+
+    print(f"📊 Total: {len(markdown_files)} markdown files across all modules")
     
     # Process each file
     total_chunks = 0
