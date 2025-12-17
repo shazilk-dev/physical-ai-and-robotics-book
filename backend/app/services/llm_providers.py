@@ -79,7 +79,7 @@ class OpenAIProvider(BaseLLMProvider):
         self.client = OpenAI(api_key=api_key)
         self.embedding_model = "text-embedding-3-small"
         self.chat_model = "gpt-4o-mini"
-        print(f"✅ OpenAI Provider initialized")
+        print(f"[OK] OpenAI Provider initialized")
         print(f"   Embedding Model: {self.embedding_model}")
         print(f"   Chat Model: {self.chat_model}")
 
@@ -133,7 +133,7 @@ class GeminiProvider(BaseLLMProvider):
             self.embedding_model = "models/text-embedding-004"
             self.chat_model = "gemini-1.5-flash"
 
-            print(f"✅ Gemini Provider initialized")
+            print(f"[OK] Gemini Provider initialized")
             print(f"   Embedding Model: {self.embedding_model}")
             print(f"   Chat Model: {self.chat_model}")
 
@@ -223,7 +223,7 @@ class QwenProvider(BaseLLMProvider):
             self.embedding_model = "text-embedding-v3"
             self.chat_model = "qwen-turbo"
 
-            print(f"✅ Qwen Provider initialized")
+            print(f"[OK] Qwen Provider initialized")
             print(f"   Embedding Model: {self.embedding_model}")
             print(f"   Chat Model: {self.chat_model}")
 
@@ -313,7 +313,7 @@ def get_llm_provider(provider_name: Optional[str] = None) -> BaseLLMProvider:
         return _provider_cache[provider_name]
 
     print(f"\n{'='*60}")
-    print(f"🔧 Initializing LLM Provider: {provider_name.upper()}")
+    print(f"[INIT] Initializing LLM Provider: {provider_name.upper()}")
     print(f"{'='*60}")
 
     # Create new provider instance

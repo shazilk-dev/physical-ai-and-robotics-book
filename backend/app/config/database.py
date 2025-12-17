@@ -19,9 +19,9 @@ async def init_db_pool():
                 max_size=10,
                 command_timeout=60
             )
-            print("✅ Database pool connected")
+            print("[OK] Database pool connected")
         except Exception as e:
-            print(f"⚠️  Database connection failed: {e}")
+            print(f"[WARNING] Database connection failed: {e}")
             print("   Auth endpoints will not work without database")
     return _pool
 

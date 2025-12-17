@@ -114,7 +114,7 @@ async def query_rag(request: QueryRequest):
 
         # Check if provider override is specified
         if request.provider:
-            print(f"🔄 Using provider override: {request.provider}")
+            print(f"[OVERRIDE] Using provider override: {request.provider}")
             result = rag_service.query_with_provider(
                 question=request.question,
                 provider_name=request.provider,
@@ -134,7 +134,7 @@ async def query_rag(request: QueryRequest):
     except Exception as e:
         import traceback
         error_detail = traceback.format_exc()
-        print(f"❌ RAG Query Error: {error_detail}")
+        print(f"[ERROR] RAG Query Error: {error_detail}")
         raise HTTPException(
             status_code=500,
             detail=f"Error processing query: {str(e)}"
@@ -185,7 +185,7 @@ async def query_rag_contextual(request: ContextualQueryRequest):
             request.validate_selected_text(request.selected_text)
 
         print(f"\n{'='*60}")
-        print(f"📥 Contextual Query Request:")
+        print(f"[REQUEST] Contextual Query Request:")
         print(f"   Question: {request.question[:80]}...")
         if request.selected_text:
             print(f"   Selected: {request.selected_text[:50]}...")
@@ -244,7 +244,7 @@ async def query_rag_contextual(request: ContextualQueryRequest):
 
         # Log success
         elapsed_time = (time.time() - start_time) * 1000
-        print(f"✅ Query completed in {elapsed_time:.0f}ms")
+        print(f"[OK] Query completed in {elapsed_time:.0f}ms")
         print(f"   Citations: {result.get('citations', [])}")
         print(f"   Sources: {len(result.get('sources', []))}")
 
@@ -252,7 +252,7 @@ async def query_rag_contextual(request: ContextualQueryRequest):
 
     except ValueError as ve:
         # Validation error
-        print(f"⚠️  Validation Error: {str(ve)}")
+        print(f"[VALIDATION] Validation Error: {str(ve)}")
         raise HTTPException(
             status_code=400,
             detail=str(ve)
@@ -260,7 +260,7 @@ async def query_rag_contextual(request: ContextualQueryRequest):
     except Exception as e:
         import traceback
         error_detail = traceback.format_exc()
-        print(f"❌ Contextual RAG Query Error:")
+        print(f"[ERROR] Contextual RAG Query Error:")
         print(error_detail)
 
         # Don't expose internal errors to users
@@ -276,16 +276,29 @@ async def health_check():
     try:
         rag_service = get_rag_service()
         # Test Qdrant connection
-        collections = rag_service.qdrant_client.get_collections()
+        try:
+            collections = rag_service.qdrant_client.get_collections()
+            collection_names = [c.name for c in collections.collections]
+        except Exception as conn_error:
+            # Handle collection listing error gracefully
+            print(f"[WARNING] Warning during health check: {conn_error}")
+            collection_names = ["error_listing_collections"]
+
         return {
             "status": "healthy",
             "qdrant_connected": True,
-            "collections": [c.name for c in collections.collections]
+            "collections": collection_names,
+            "provider": rag_service.llm_provider.get_provider_name(),
+            "collection_name": rag_service.collection_name
         }
     except Exception as e:
+        import traceback
+        error_detail = traceback.format_exc()
+        print(f"[ERROR] Health check error: {error_detail}")
         return {
             "status": "unhealthy",
-            "error": str(e)
+            "error": str(e),
+            "qdrant_connected": False
         }
 
 

@@ -16,12 +16,12 @@ async def lifespan(app: FastAPI):
     try:
         await init_db_pool()
     except Exception as e:
-        print(f"⚠️  Startup warning: {e}")
+        print(f"[WARNING] Startup warning: {e}")
     yield
     # Shutdown
     try:
         await close_db_pool()
-        print("✅ Database pool closed")
+        print("[OK] Database pool closed")
     except:
         pass
 
@@ -38,7 +38,7 @@ app = FastAPI(
 
 # Debug: Print allowed origins on startup
 print("="*50)
-print("🌐 CORS Configuration:")
+print("CORS Configuration:")
 print(f"   Allowed Origins: {settings.ALLOWED_ORIGINS}")
 print(f"   Environment: {settings.ENVIRONMENT}")
 print("="*50)

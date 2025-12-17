@@ -171,9 +171,9 @@ class RAGService:
         if not qdrant_key:
             raise ValueError("QDRANT_API_KEY environment variable is not set")
 
-        print(f"🔧 Initializing RAG Service...")
+        print(f"[INIT] Initializing RAG Service...")
         print(f"   Qdrant URL: {qdrant_url[:30]}...")
-        print(f"   Qdrant Key: {'✅ Set' if qdrant_key else '❌ Missing'}")
+        print(f"   Qdrant Key: {'[OK] Set' if qdrant_key else '[ERROR] Missing'}")
 
         # Initialize LLM provider (handles its own API key validation)
         self.llm_provider = get_llm_provider()
@@ -195,7 +195,7 @@ class RAGService:
         # Ensure collection exists with correct dimension
         self._ensure_collection_exists()
 
-        print(f"✅ RAG Service initialized with {self.llm_provider.get_provider_name()}")
+        print(f"[OK] RAG Service initialized with {self.llm_provider.get_provider_name()}")
 
     def _ensure_collection_exists(self):
         """
@@ -211,24 +211,42 @@ class RAGService:
             existing_dimension = collection_info.config.params.vectors.size
 
             if existing_dimension != self.embedding_dimension:
-                print(f"⚠️  Warning: Collection '{self.collection_name}' exists with dimension {existing_dimension}")
+                print(f"[WARNING] Collection '{self.collection_name}' exists with dimension {existing_dimension}")
                 print(f"   Current provider needs dimension {self.embedding_dimension}")
                 print(f"   You may need to re-seed this collection or use a different provider")
             else:
-                print(f"✅ Collection '{self.collection_name}' exists with correct dimension {self.embedding_dimension}")
+                print(f"[OK] Collection '{self.collection_name}' exists with correct dimension {self.embedding_dimension}")
 
-        except Exception:
-            # Collection doesn't exist, create it
-            print(f"📦 Creating new collection '{self.collection_name}'...")
-            self.qdrant_client.create_collection(
-                collection_name=self.collection_name,
-                vectors_config=VectorParams(
-                    size=self.embedding_dimension,
-                    distance=Distance.COSINE
-                )
-            )
-            print(f"✅ Created collection with dimension {self.embedding_dimension}")
-            print(f"⚠️  Collection is empty - run 'python scripts/seed_vector_db.py' to index content")
+        except Exception as e:
+            # Collection doesn't exist, try to create it
+            error_message = str(e).lower()
+
+            # Check if error is "not found" or similar (collection doesn't exist)
+            if 'not found' in error_message or 'doesn\'t exist' in error_message or '404' in error_message:
+                try:
+                    print(f"[CREATE] Creating new collection '{self.collection_name}'...")
+                    self.qdrant_client.create_collection(
+                        collection_name=self.collection_name,
+                        vectors_config=VectorParams(
+                            size=self.embedding_dimension,
+                            distance=Distance.COSINE
+                        )
+                    )
+                    print(f"[OK] Created collection with dimension {self.embedding_dimension}")
+                    print(f"[WARNING] Collection is empty - run 'python scripts/seed_vector_db.py' to index content")
+                except Exception as create_error:
+                    create_error_msg = str(create_error).lower()
+                    # If collection already exists, that's fine - just log and continue
+                    if 'already exists' in create_error_msg or '409' in create_error_msg:
+                        print(f"[OK] Collection '{self.collection_name}' already exists (concurrent creation)")
+                    else:
+                        # Re-raise if it's a different error
+                        raise create_error
+            else:
+                # For other errors (like connection issues), log and continue
+                # The service will still work if Qdrant is accessible
+                print(f"[WARNING] Warning checking collection: {str(e)}")
+                print(f"   Continuing initialization - collection may already exist")
 
     def create_collection(self):
         """
@@ -364,7 +382,7 @@ Please provide a clear, educational answer based on the context above. Include s
             return response
 
         except Exception as e:
-            print(f"❌ Error in query method: {e}")
+            print(f"[ERROR] Error in query method: {e}")
             raise
 
     def contextual_query(
@@ -391,7 +409,7 @@ Please provide a clear, educational answer based on the context above. Include s
             Query response dict with answer, sources, and citations
         """
         try:
-            print(f"🎯 Contextual Query:")
+            print(f"[CONTEXTUAL] Contextual Query:")
             print(f"   Selected: {selected_text[:50]}...")
             print(f"   Action: {action}")
             if settings:
@@ -426,7 +444,7 @@ Please provide a clear, educational answer based on the context above. Include s
             return response
 
         except Exception as e:
-            print(f"❌ Error in contextual_query: {e}")
+            print(f"[ERROR] Error in contextual_query: {e}")
             raise
 
     def generate_contextual_response(
@@ -612,7 +630,7 @@ Please provide a clear, educational answer based on the context above. Include s
             }
 
         except Exception as e:
-            print(f"❌ Error in query_with_provider: {e}")
+            print(f"[ERROR] Error in query_with_provider: {e}")
             raise
 
     def contextual_query_with_provider(
@@ -729,7 +747,7 @@ Respond according to your instructions and the student's preferences."""
             }
 
         except Exception as e:
-            print(f"❌ Error in contextual_query_with_provider: {e}")
+            print(f"[ERROR] Error in contextual_query_with_provider: {e}")
             raise
 
 
