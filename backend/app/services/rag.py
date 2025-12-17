@@ -1,14 +1,15 @@
 """
 RAG Service for Physical AI Book
 Handles vector search and response generation with personalized response styling
+Supports multiple LLM providers: OpenAI, Google Gemini, Alibaba Qwen
 """
 import os
 from pathlib import Path
 from typing import List, Dict, Any, Optional
-from openai import OpenAI
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct, Filter, FieldCondition, MatchValue
 from dotenv import load_dotenv
+from .llm_providers import get_llm_provider, BaseLLMProvider
 
 # Load environment variables
 load_dotenv(Path(__file__).parent.parent.parent / ".env")
@@ -160,32 +161,33 @@ Remember: Adapt your response to match these settings while staying accurate and
 
 class RAGService:
     def __init__(self):
-        """Initialize RAG service with OpenAI and Qdrant clients"""
-        # Validate environment variables
-        openai_key = os.getenv("OPENAI_API_KEY")
+        """Initialize RAG service with LLM provider and Qdrant client"""
+        # Validate Qdrant environment variables
         qdrant_url = os.getenv("QDRANT_URL")
         qdrant_key = os.getenv("QDRANT_API_KEY")
 
-        if not openai_key:
-            raise ValueError("OPENAI_API_KEY environment variable is not set")
         if not qdrant_url:
             raise ValueError("QDRANT_URL environment variable is not set")
         if not qdrant_key:
             raise ValueError("QDRANT_API_KEY environment variable is not set")
 
         print(f"🔧 Initializing RAG Service...")
-        print(f"   OpenAI Key: {'✅ Set' if openai_key else '❌ Missing'}")
-        print(f"   Qdrant URL: {qdrant_url[:30]}..." if qdrant_url else "❌ Missing")
+        print(f"   Qdrant URL: {qdrant_url[:30]}...")
         print(f"   Qdrant Key: {'✅ Set' if qdrant_key else '❌ Missing'}")
 
-        self.openai_client = OpenAI(api_key=openai_key)
+        # Initialize LLM provider (handles its own API key validation)
+        self.llm_provider = get_llm_provider()
+
+        # Initialize Qdrant client
         self.qdrant_client = QdrantClient(url=qdrant_url, api_key=qdrant_key)
         self.collection_name = os.getenv("QDRANT_COLLECTION_NAME", "physical_ai_book")
-        self.embedding_model = "text-embedding-3-small"
-        self.chat_model = "gpt-4o-mini"
+
+        # Get embedding dimension from provider
+        self.embedding_dimension = self.llm_provider.get_embedding_dimension()
 
         print(f"   Collection: {self.collection_name}")
-        print(f"✅ RAG Service initialized")
+        print(f"   Embedding Dimension: {self.embedding_dimension}")
+        print(f"✅ RAG Service initialized with {self.llm_provider.get_provider_name()}")
         
     def create_collection(self):
         """Create Qdrant collection if it doesn't exist"""
@@ -196,19 +198,15 @@ class RAGService:
             self.qdrant_client.create_collection(
                 collection_name=self.collection_name,
                 vectors_config=VectorParams(
-                    size=1536,  # text-embedding-3-small dimension
+                    size=self.embedding_dimension,  # Dynamic dimension based on provider
                     distance=Distance.COSINE
                 )
             )
-            print(f"Created collection '{self.collection_name}'")
+            print(f"Created collection '{self.collection_name}' with dimension {self.embedding_dimension}")
     
     def generate_embedding(self, text: str) -> List[float]:
-        """Generate embedding for text using OpenAI"""
-        response = self.openai_client.embeddings.create(
-            model=self.embedding_model,
-            input=text
-        )
-        return response.data[0].embedding
+        """Generate embedding for text using configured LLM provider"""
+        return self.llm_provider.generate_embedding(text)
     
     def search_similar_chunks(
         self,
@@ -282,18 +280,15 @@ Student Question: {query}
 
 Please provide a clear, educational answer based on the context above. Include specific section references where appropriate."""
         
-        # Generate response
-        response = self.openai_client.chat.completions.create(
-            model=self.chat_model,
+        # Generate response using LLM provider
+        answer = self.llm_provider.generate_chat_completion(
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
-            temperature=0.7,
-            max_tokens=1000
+            max_tokens=1000,
+            temperature=0.7
         )
-        
-        answer = response.choices[0].message.content
         
         # Extract citations (sections referenced)
         citations = list(set([
@@ -304,7 +299,7 @@ Please provide a clear, educational answer based on the context above. Include s
             "answer": answer,
             "sources": context_chunks,
             "citations": citations,
-            "model": self.chat_model
+            "model": self.llm_provider.get_provider_name()
         }
     
     def query(
@@ -451,18 +446,15 @@ Student's question: {question}
 
 Respond according to your instructions and the student's preferences."""
 
-        # Generate response
-        response = self.openai_client.chat.completions.create(
-            model=self.chat_model,
+        # Generate response using LLM provider
+        answer = self.llm_provider.generate_chat_completion(
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
-            temperature=0.7,
-            max_tokens=max_tokens  # Adapt based on response mode
+            max_tokens=max_tokens,  # Adapt based on response mode
+            temperature=0.7
         )
-
-        answer = response.choices[0].message.content
 
         # Extract citations
         citations = list(set([
@@ -473,7 +465,7 @@ Respond according to your instructions and the student's preferences."""
             "answer": answer,
             "sources": context_chunks,
             "citations": citations,
-            "model": self.chat_model,
+            "model": self.llm_provider.get_provider_name(),
             "settings_used": settings  # Return what settings were applied
         }
 
