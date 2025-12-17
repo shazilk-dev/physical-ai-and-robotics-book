@@ -1,6 +1,7 @@
 """
 LLM Provider Abstraction Layer
 Supports multiple LLM providers: OpenAI, Google Gemini, Qwen (Alibaba Cloud)
+Supports runtime provider switching without restart
 """
 import os
 from abc import ABC, abstractmethod
@@ -276,27 +277,47 @@ class QwenProvider(BaseLLMProvider):
         return "Alibaba Qwen"
 
 
-def get_llm_provider() -> BaseLLMProvider:
+# Provider cache for runtime switching
+_provider_cache: Dict[str, BaseLLMProvider] = {}
+
+
+def get_llm_provider(provider_name: Optional[str] = None) -> BaseLLMProvider:
     """
-    Factory function to get LLM provider based on environment variable
+    Factory function to get LLM provider based on parameter or environment variable
+    Caches providers for efficient runtime switching
+
+    Args:
+        provider_name: Optional provider name ('openai', 'gemini', 'qwen')
+                      If None, uses LLM_PROVIDER environment variable
 
     Environment Variables:
-        LLM_PROVIDER: Provider name ('openai', 'gemini', 'qwen')
+        LLM_PROVIDER: Default provider name (used when provider_name is None)
         OPENAI_API_KEY: OpenAI API key (if using OpenAI)
         GEMINI_API_KEY: Google AI Studio API key (if using Gemini)
         QWEN_API_KEY: Alibaba Cloud API key (if using Qwen)
 
     Returns:
-        Initialized LLM provider instance
+        Initialized LLM provider instance (cached for reuse)
 
     Raises:
         ValueError: If provider name is invalid or API key is missing
     """
-    provider_name = os.getenv("LLM_PROVIDER", "openai").lower()
+    # Use parameter or fall back to environment variable
+    if provider_name is None:
+        provider_name = os.getenv("LLM_PROVIDER", "openai")
+
+    provider_name = provider_name.lower()
+
+    # Return cached provider if available
+    if provider_name in _provider_cache:
+        return _provider_cache[provider_name]
 
     print(f"\n{'='*60}")
     print(f"🔧 Initializing LLM Provider: {provider_name.upper()}")
     print(f"{'='*60}")
+
+    # Create new provider instance
+    provider = None
 
     if provider_name == "openai":
         api_key = os.getenv("OPENAI_API_KEY")
@@ -305,7 +326,7 @@ def get_llm_provider() -> BaseLLMProvider:
                 "OPENAI_API_KEY environment variable not set. "
                 "Get your key from: https://platform.openai.com/api-keys"
             )
-        return OpenAIProvider(api_key)
+        provider = OpenAIProvider(api_key)
 
     elif provider_name == "gemini":
         api_key = os.getenv("GEMINI_API_KEY")
@@ -314,7 +335,7 @@ def get_llm_provider() -> BaseLLMProvider:
                 "GEMINI_API_KEY environment variable not set. "
                 "Get your free key from: https://ai.google.dev/"
             )
-        return GeminiProvider(api_key)
+        provider = GeminiProvider(api_key)
 
     elif provider_name == "qwen":
         api_key = os.getenv("QWEN_API_KEY")
@@ -323,10 +344,14 @@ def get_llm_provider() -> BaseLLMProvider:
                 "QWEN_API_KEY environment variable not set. "
                 "Get your key from: https://dashscope.console.aliyun.com/"
             )
-        return QwenProvider(api_key)
+        provider = QwenProvider(api_key)
 
     else:
         raise ValueError(
             f"Unknown LLM provider: '{provider_name}'. "
             f"Supported providers: 'openai', 'gemini', 'qwen'"
         )
+
+    # Cache the provider for future use
+    _provider_cache[provider_name] = provider
+    return provider

@@ -15,11 +15,18 @@ import {
   AlertCircle,
   Loader2,
   Settings,
+  Sparkles,
 } from "lucide-react";
 import styles from "./ChatWidget.module.css";
 import SelectionMenu, { SelectionContext } from "../SelectionMenu/SelectionMenu";
 import ChatSettingsPanel from "./ChatSettingsPanel";
-import { ChatSettings, DEFAULT_SETTINGS } from "./types";
+import {
+  ChatSettings,
+  DEFAULT_SETTINGS,
+  LLMProvider,
+  DEFAULT_PROVIDER,
+  LLM_PROVIDERS,
+} from "./types";
 
 interface Source {
   content: string;
@@ -45,6 +52,7 @@ interface ContextualQueryRequest {
   action?: string;
   num_results?: number;
   settings?: ChatSettings; // Include user preferences
+  provider?: string; // LLM provider override
 }
 
 interface Message {
@@ -93,6 +101,8 @@ export default function ChatWidget() {
   const [selectionContext, setSelectionContext] = useState<SelectionContext | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [settings, setSettings] = useState<ChatSettings>(DEFAULT_SETTINGS);
+  const [provider, setProvider] = useState<LLMProvider>(DEFAULT_PROVIDER);
+  const [showProviderMenu, setShowProviderMenu] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -128,6 +138,27 @@ export default function ChatWidget() {
       console.error('Failed to save chat settings:', error);
     }
   }, [settings]);
+
+  // Load provider from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedProvider = localStorage.getItem('chatProvider');
+      if (savedProvider && (savedProvider === 'openai' || savedProvider === 'gemini' || savedProvider === 'qwen')) {
+        setProvider(savedProvider as LLMProvider);
+      }
+    } catch (error) {
+      console.error('Failed to load provider:', error);
+    }
+  }, []);
+
+  // Save provider to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('chatProvider', provider);
+    } catch (error) {
+      console.error('Failed to save provider:', error);
+    }
+  }, [provider]);
 
   // Handle text selection actions
   const handleSelectionAction = (context: SelectionContext) => {
@@ -194,6 +225,7 @@ export default function ChatWidget() {
         question: userMessage.content,
         num_results: 5,
         settings: settings, // Include user preferences
+        provider: provider, // Include selected provider
       };
 
       // Add selection context if available
@@ -305,14 +337,34 @@ export default function ChatWidget() {
           )}
 
           <div className={styles.messageBody}>
-            {/* Show action badge for assistant messages */}
-            {!isUser && actionBadge && (
-              <div
-                className={styles.actionBadge}
-                style={{ backgroundColor: actionBadge.color }}
-              >
-                <span className={styles.badgeIcon}>{actionBadge.icon}</span>
-                <span className={styles.badgeLabel}>{actionBadge.label}</span>
+            {/* Show badges for assistant messages */}
+            {!isUser && (
+              <div className={styles.badgesContainer}>
+                {/* Action badge */}
+                {actionBadge && (
+                  <div
+                    className={styles.actionBadge}
+                    style={{ backgroundColor: actionBadge.color }}
+                  >
+                    <span className={styles.badgeIcon}>{actionBadge.icon}</span>
+                    <span className={styles.badgeLabel}>{actionBadge.label}</span>
+                  </div>
+                )}
+                {/* Provider badge */}
+                <div
+                  className={styles.providerBadge}
+                  style={{
+                    backgroundColor: LLM_PROVIDERS.find(p => p.value === provider)?.color + '15',
+                    borderColor: LLM_PROVIDERS.find(p => p.value === provider)?.color,
+                  }}
+                >
+                  <span className={styles.providerBadgeIcon}>
+                    {LLM_PROVIDERS.find(p => p.value === provider)?.icon}
+                  </span>
+                  <span className={styles.providerBadgeLabel}>
+                    {LLM_PROVIDERS.find(p => p.value === provider)?.name}
+                  </span>
+                </div>
               </div>
             )}
 
@@ -408,6 +460,51 @@ export default function ChatWidget() {
               </div>
             </div>
             <div className={styles.headerButtons}>
+              {/* Provider Selector */}
+              <div className={styles.providerSelector}>
+                <button
+                  className={styles.providerButton}
+                  onClick={() => setShowProviderMenu(!showProviderMenu)}
+                  aria-label="Select AI provider"
+                  title={`Current: ${LLM_PROVIDERS.find(p => p.value === provider)?.name}`}
+                >
+                  <Sparkles size={20} />
+                  <span className={styles.providerButtonLabel}>
+                    {LLM_PROVIDERS.find(p => p.value === provider)?.icon}
+                  </span>
+                </button>
+
+                {showProviderMenu && (
+                  <div className={styles.providerMenu}>
+                    <div className={styles.providerMenuHeader}>AI Provider</div>
+                    {LLM_PROVIDERS.map((p) => (
+                      <button
+                        key={p.value}
+                        className={`${styles.providerOption} ${
+                          provider === p.value ? styles.active : ''
+                        }`}
+                        onClick={() => {
+                          setProvider(p.value);
+                          setShowProviderMenu(false);
+                        }}
+                        style={{
+                          borderLeft: provider === p.value ? `3px solid ${p.color}` : 'none'
+                        }}
+                      >
+                        <span className={styles.providerIcon}>{p.icon}</span>
+                        <div className={styles.providerInfo}>
+                          <div className={styles.providerName}>{p.name}</div>
+                          <div className={styles.providerDesc}>{p.description}</div>
+                        </div>
+                        {provider === p.value && (
+                          <span className={styles.checkmark}>✓</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <button
                 className={styles.settingsButton}
                 onClick={() => setShowSettings(true)}

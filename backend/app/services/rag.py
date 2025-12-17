@@ -503,6 +503,236 @@ Respond according to your instructions and the student's preferences."""
         }
 
 
+    def query_with_provider(
+        self,
+        question: str,
+        provider_name: str,
+        module: str = None,
+        num_results: int = 5
+    ) -> Dict[str, Any]:
+        """
+        Execute query using a specific provider (runtime override)
+
+        Args:
+            question: User's question
+            provider_name: Provider to use ('openai', 'gemini', 'qwen')
+            module: Optional module filter
+            num_results: Number of results to retrieve
+
+        Returns:
+            Query response with provider-specific results
+        """
+        from .llm_providers import get_llm_provider
+
+        try:
+            # Get provider-specific instance
+            provider = get_llm_provider(provider_name)
+
+            # Generate provider-specific collection name
+            base_collection = os.getenv("QDRANT_COLLECTION_NAME", "physical_ai_book")
+            collection_name = f"{base_collection}_{provider_name.lower()}"
+
+            # Search using provider-specific embeddings
+            query_vector = provider.generate_embedding(question)
+
+            query_filter = None
+            if module:
+                query_filter = Filter(
+                    must=[FieldCondition(key="module", match=MatchValue(value=module))]
+                )
+
+            search_result = self.qdrant_client.search(
+                collection_name=collection_name,
+                query_vector=query_vector,
+                limit=num_results,
+                query_filter=query_filter
+            )
+
+            relevant_chunks = []
+            for hit in search_result:
+                relevant_chunks.append({
+                    "content": hit.payload.get("content"),
+                    "module": hit.payload.get("module"),
+                    "chapter": hit.payload.get("chapter"),
+                    "section": hit.payload.get("section"),
+                    "file_path": hit.payload.get("file_path"),
+                    "score": hit.score
+                })
+
+            if not relevant_chunks:
+                return {
+                    "answer": f"I couldn't find relevant information using {provider.get_provider_name()}. The collection '{collection_name}' might be empty. Please seed it first.",
+                    "sources": [],
+                    "citations": [],
+                    "model": provider.get_provider_name()
+                }
+
+            # Generate response using provider
+            context = "\n\n".join([
+                f"[Source: {chunk['section']}]\n{chunk['content']}"
+                for chunk in relevant_chunks
+            ])
+
+            system_prompt = """You are an expert instructor for Physical AI and Humanoid Robotics.
+You help students understand ROS 2, URDF, sensors, and robot programming.
+
+Guidelines:
+- Answer based on the provided context from the textbook
+- Be clear and educational, assuming the student is learning
+- Include code examples when relevant
+- Cite specific sections when referencing material
+- If the answer isn't in the context, say so and provide general guidance
+- Use analogies and visual descriptions when helpful
+"""
+
+            user_prompt = f"""Context from the Physical AI & Humanoid Robotics textbook:
+
+{context}
+
+Student Question: {question}
+
+Please provide a clear, educational answer based on the context above. Include specific section references where appropriate."""
+
+            answer = provider.generate_chat_completion(
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ],
+                max_tokens=1000,
+                temperature=0.7
+            )
+
+            citations = list(set([chunk['section'] for chunk in relevant_chunks]))
+
+            return {
+                "answer": answer,
+                "sources": relevant_chunks,
+                "citations": citations,
+                "model": provider.get_provider_name()
+            }
+
+        except Exception as e:
+            print(f"❌ Error in query_with_provider: {e}")
+            raise
+
+    def contextual_query_with_provider(
+        self,
+        question: str,
+        selected_text: str,
+        action: str,
+        provider_name: str,
+        module: str = None,
+        num_results: int = 5,
+        settings: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """
+        Execute contextual query using a specific provider (runtime override)
+
+        Args:
+            question: User's question
+            selected_text: Text user selected
+            action: Action type
+            provider_name: Provider to use ('openai', 'gemini', 'qwen')
+            module: Optional module filter
+            num_results: Number of results
+            settings: User's response style preferences
+
+        Returns:
+            Query response with provider-specific results
+        """
+        from .llm_providers import get_llm_provider
+
+        try:
+            # Get provider-specific instance
+            provider = get_llm_provider(provider_name)
+
+            # Generate provider-specific collection name
+            base_collection = os.getenv("QDRANT_COLLECTION_NAME", "physical_ai_book")
+            collection_name = f"{base_collection}_{provider_name.lower()}"
+
+            # Search using provider-specific embeddings
+            query_vector = provider.generate_embedding(selected_text)
+
+            query_filter = None
+            if module:
+                query_filter = Filter(
+                    must=[FieldCondition(key="module", match=MatchValue(value=module))]
+                )
+
+            search_result = self.qdrant_client.search(
+                collection_name=collection_name,
+                query_vector=query_vector,
+                limit=num_results,
+                query_filter=query_filter
+            )
+
+            relevant_chunks = []
+            for hit in search_result:
+                relevant_chunks.append({
+                    "content": hit.payload.get("content"),
+                    "module": hit.payload.get("module"),
+                    "chapter": hit.payload.get("chapter"),
+                    "section": hit.payload.get("section"),
+                    "file_path": hit.payload.get("file_path"),
+                    "score": hit.score
+                })
+
+            if not relevant_chunks:
+                return {
+                    "answer": f"I couldn't find information about '{selected_text}' using {provider.get_provider_name()}. Could you try selecting a different concept?",
+                    "sources": [],
+                    "citations": [],
+                    "action": action,
+                    "model": provider.get_provider_name()
+                }
+
+            # Generate response using provider
+            styler = ResponseStyler(settings)
+            system_prompt = styler.get_system_prompt(action=action)
+            max_tokens = styler.adjust_max_tokens()
+
+            context = "\n\n".join([
+                f"[Source: {chunk['section']}]\n{chunk['content']}"
+                for chunk in relevant_chunks
+            ])
+
+            user_prompt = f"""The student is reading about Physical AI and Robotics.
+
+They selected this text from the document:
+"{selected_text}"
+
+Relevant content from the textbook:
+{context}
+
+Student's question: {question}
+
+Respond according to your instructions and the student's preferences."""
+
+            answer = provider.generate_chat_completion(
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ],
+                max_tokens=max_tokens,
+                temperature=0.7
+            )
+
+            citations = list(set([chunk['section'] for chunk in relevant_chunks]))
+
+            return {
+                "answer": answer,
+                "sources": relevant_chunks,
+                "citations": citations,
+                "model": provider.get_provider_name(),
+                "settings_used": settings,
+                "action": action
+            }
+
+        except Exception as e:
+            print(f"❌ Error in contextual_query_with_provider: {e}")
+            raise
+
+
 # Singleton instance
 _rag_service = None
 

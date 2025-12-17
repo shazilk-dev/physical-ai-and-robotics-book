@@ -14,6 +14,7 @@ class QueryRequest(BaseModel):
     question: str
     module: Optional[str] = None
     num_results: Optional[int] = 5
+    provider: Optional[str] = None  # LLM provider: openai, gemini, qwen (overrides env variable)
 
 
 class ChatSettings(BaseModel):
@@ -33,6 +34,7 @@ class ContextualQueryRequest(BaseModel):
     module: Optional[str] = None
     num_results: Optional[int] = 5
     settings: Optional[ChatSettings] = None  # User's response style preferences
+    provider: Optional[str] = None  # LLM provider: openai, gemini, qwen (overrides env variable)
 
     class Config:
         json_schema_extra = {
@@ -109,13 +111,24 @@ async def query_rag(request: QueryRequest):
     """
     try:
         rag_service = get_rag_service()
-        
-        result = rag_service.query(
-            question=request.question,
-            module=request.module,
-            num_results=request.num_results
-        )
-        
+
+        # Check if provider override is specified
+        if request.provider:
+            print(f"🔄 Using provider override: {request.provider}")
+            result = rag_service.query_with_provider(
+                question=request.question,
+                provider_name=request.provider,
+                module=request.module,
+                num_results=request.num_results
+            )
+        else:
+            # Use default provider from env variable
+            result = rag_service.query(
+                question=request.question,
+                module=request.module,
+                num_results=request.num_results
+            )
+
         return QueryResponse(**result)
     
     except Exception as e:
@@ -190,23 +203,44 @@ async def query_rag_contextual(request: ContextualQueryRequest):
         if request.settings:
             settings_dict = request.settings.model_dump()
 
-        # Use contextual query method if selection context provided
-        if request.selected_text and request.action:
-            result = rag_service.contextual_query(
-                question=request.question,
-                selected_text=request.selected_text,
-                action=request.action,
-                module=request.module,
-                num_results=request.num_results,
-                settings=settings_dict  # Pass user settings
-            )
+        # Check if provider override is specified
+        if request.provider:
+            print(f"   Using provider override: {request.provider}")
+            # Use provider-specific query methods
+            if request.selected_text and request.action:
+                result = rag_service.contextual_query_with_provider(
+                    question=request.question,
+                    selected_text=request.selected_text,
+                    action=request.action,
+                    provider_name=request.provider,
+                    module=request.module,
+                    num_results=request.num_results,
+                    settings=settings_dict
+                )
+            else:
+                result = rag_service.query_with_provider(
+                    question=request.question,
+                    provider_name=request.provider,
+                    module=request.module,
+                    num_results=request.num_results
+                )
         else:
-            # Fall back to regular query
-            result = rag_service.query(
-                question=request.question,
-                module=request.module,
-                num_results=request.num_results
-            )
+            # Use default provider from env variable
+            if request.selected_text and request.action:
+                result = rag_service.contextual_query(
+                    question=request.question,
+                    selected_text=request.selected_text,
+                    action=request.action,
+                    module=request.module,
+                    num_results=request.num_results,
+                    settings=settings_dict
+                )
+            else:
+                result = rag_service.query(
+                    question=request.question,
+                    module=request.module,
+                    num_results=request.num_results
+                )
 
         # Log success
         elapsed_time = (time.time() - start_time) * 1000

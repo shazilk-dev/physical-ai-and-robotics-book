@@ -14,6 +14,11 @@ export type ResponseMode = 'quick' | 'detailed' | 'tutorial' | 'socratic';
 export type LanguageStyle = 'casual' | 'formal' | 'technical';
 
 /**
+ * LLM Provider - which AI service to use
+ */
+export type LLMProvider = 'openai' | 'gemini' | 'qwen';
+
+/**
  * Chat settings interface - user preferences for AI responses
  */
 export interface ChatSettings {
@@ -117,3 +122,46 @@ export const LANGUAGE_STYLES: LanguageStyleInfo[] = [
     description: 'Precise technical terminology',
   },
 ];
+
+/**
+ * LLM Provider information for UI display
+ */
+export interface LLMProviderInfo {
+  value: LLMProvider;
+  name: string;
+  icon: string;
+  description: string;
+  color: string;
+}
+
+/**
+ * Available LLM providers with metadata
+ */
+export const LLM_PROVIDERS: LLMProviderInfo[] = [
+  {
+    value: 'openai',
+    name: 'OpenAI',
+    icon: '🤖',
+    description: 'GPT-4o-mini (Best quality, paid)',
+    color: '#10a37f',
+  },
+  {
+    value: 'gemini',
+    name: 'Gemini',
+    icon: '✨',
+    description: 'Google Gemini 1.5 Flash (Free)',
+    color: '#4285f4',
+  },
+  {
+    value: 'qwen',
+    name: 'Qwen',
+    icon: '🌟',
+    description: 'Alibaba Qwen (Affordable)',
+    color: '#ff6a00',
+  },
+];
+
+/**
+ * Default LLM provider
+ */
+export const DEFAULT_PROVIDER: LLMProvider = 'openai';
