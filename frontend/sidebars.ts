@@ -20,6 +20,19 @@ const sidebars: SidebarsConfig = {
       id: "intro",
       label: "Getting Started",
     },
+
+    // Chapters Section
+    {
+      type: "category",
+      label: "📚 Core Chapters",
+      collapsed: false,
+      items: [
+        "chapters/chapter-01-foundations",
+        "chapters/chapter-02-kinematics-actuation",
+      ],
+    },
+
+    // Module 1: ROS 2 Fundamentals
     {
       type: "category",
       label: "Module 1: ROS 2 Fundamentals",
@@ -42,7 +55,7 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "category",
-          label: "Robot Description",
+          label: "Robot Description (URDF)",
           collapsed: true,
           items: [
             "module-01-ros2/urdf-robot-description/urdf-basics",
@@ -51,19 +64,89 @@ const sidebars: SidebarsConfig = {
             "module-01-ros2/urdf-robot-description/package-testing",
           ],
         },
+        {
+          type: "category",
+          label: "Sensors & Proprioception",
+          collapsed: true,
+          items: [
+            "module-01-ros2/sensors-proprioception/1.3.1-imu-encoder-basics",
+            "module-01-ros2/sensors-proprioception/1.3.2-realsense-integration",
+            "module-01-ros2/sensors-proprioception/1.3.3-sensor-fusion",
+          ],
+        },
+        "module-01-ros2/quiz",
+      ],
+    },
+
+    // Module 2: Architecture & Hardware
+    {
+      type: "category",
+      label: "Module 2: Architecture & Hardware",
+      collapsed: false,
+      link: {
+        type: "doc",
+        id: "module-02-architecture/overview",
+      },
+      items: [
+        {
+          type: "category",
+          label: "Mechanical Design",
+          collapsed: true,
+          items: [
+            "module-02-architecture/mechanical-design/2.1.1-link-optimization",
+            "module-02-architecture/mechanical-design/2.1.2-center-of-mass",
+            "module-02-architecture/mechanical-design/2.1.3-material-selection",
+          ],
+        },
+        {
+          type: "category",
+          label: "Actuation Systems",
+          collapsed: true,
+          items: [
+            "module-02-architecture/actuation-systems/2.2.1-servo-motors",
+            "module-02-architecture/actuation-systems/2.2.2-harmonic-drives",
+            "module-02-architecture/actuation-systems/2.2.3-series-elastic-actuators",
+          ],
+        },
+        {
+          type: "category",
+          label: "Edge Computing",
+          collapsed: true,
+          items: [
+            "module-02-architecture/edge-compute/2.3.1-jetson-architecture",
+            "module-02-architecture/edge-compute/2.3.2-cuda-optimization",
+            "module-02-architecture/edge-compute/2.3.3-tensorrt-deployment",
+          ],
+        },
+        {
+          type: "category",
+          label: "Power Management",
+          collapsed: true,
+          items: [
+            "module-02-architecture/power-management/2.4.1-battery-systems",
+            "module-02-architecture/power-management/2.4.2-thermal-design",
+            "module-02-architecture/power-management/2.4.3-power-distribution",
+          ],
+        },
+        "module-02-architecture/quiz",
       ],
     },
 
     // Dedicated Labs Section
     {
       type: "category",
-      label: "Hands-On Labs",
+      label: "🔬 Hands-On Labs",
       collapsed: true,
       link: {
         type: "doc",
         id: "labs/overview",
       },
-      items: ["labs/lab01-ros2-basics"],
+      items: [
+        "labs/lab01-ros2-basics",
+        "labs/lab02-urdf-humanoid",
+        "labs/lab03-realsense-integration",
+        "labs/lab04-motor-control",
+      ],
     },
   ],
 
@@ -73,7 +156,13 @@ const sidebars: SidebarsConfig = {
       type: "category",
       label: "Laboratory Exercises",
       collapsed: false,
-      items: ["labs/overview", "labs/lab01-ros2-basics"],
+      items: [
+        "labs/overview",
+        "labs/lab01-ros2-basics",
+        "labs/lab02-urdf-humanoid",
+        "labs/lab03-realsense-integration",
+        "labs/lab04-motor-control",
+      ],
     },
   ],
 };

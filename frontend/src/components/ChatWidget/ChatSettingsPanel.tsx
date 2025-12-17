@@ -15,6 +15,7 @@
  */
 
 import React from 'react';
+import { Settings, X } from 'lucide-react';
 import styles from './ChatSettingsPanel.module.css';
 import {
   ChatSettings,
@@ -76,7 +77,7 @@ export default function ChatSettingsPanel({
         {/* Header */}
         <div className={styles.header}>
           <h2 className={styles.title}>
-            <span className={styles.icon} aria-hidden="true">⚙️</span>
+            <Settings className={styles.icon} size={20} aria-hidden="true" />
             Chat Settings
           </h2>
           <button
@@ -84,7 +85,7 @@ export default function ChatSettingsPanel({
             onClick={onClose}
             aria-label="Close settings"
           >
-            ✕
+            <X size={20} />
           </button>
         </div>
 
@@ -97,25 +98,26 @@ export default function ChatSettingsPanel({
               Choose how the AI tutor responds to your questions
             </p>
             <div className={styles.modeGrid}>
-              {RESPONSE_MODES.map((mode) => (
-                <button
-                  key={mode.value}
-                  className={`${styles.modeButton} ${
-                    settings.responseMode === mode.value ? styles.active : ''
-                  }`}
-                  onClick={() => handleModeChange(mode.value)}
-                  aria-label={`Select ${mode.label} mode`}
-                  aria-pressed={settings.responseMode === mode.value}
-                >
-                  <span className={styles.modeIcon} aria-hidden="true">
-                    {mode.icon}
-                  </span>
-                  <span className={styles.modeLabel}>{mode.label}</span>
-                  <span className={styles.modeDescription}>
-                    {mode.description}
-                  </span>
-                </button>
-              ))}
+              {RESPONSE_MODES.map((mode) => {
+                const ModeIcon = mode.Icon;
+                return (
+                  <button
+                    key={mode.value}
+                    className={`${styles.modeButton} ${
+                      settings.responseMode === mode.value ? styles.active : ''
+                    }`}
+                    onClick={() => handleModeChange(mode.value)}
+                    aria-label={`Select ${mode.label} mode`}
+                    aria-pressed={settings.responseMode === mode.value}
+                  >
+                    <ModeIcon className={styles.modeIcon} size={20} aria-hidden="true" />
+                    <span className={styles.modeLabel}>{mode.label}</span>
+                    <span className={styles.modeDescription}>
+                      {mode.description}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 

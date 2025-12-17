@@ -21,6 +21,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { BookOpenText, Lightbulb, Code2, HelpCircle } from 'lucide-react';
 import styles from './SelectionMenu.module.css';
 import {
   SelectionContext,
@@ -184,7 +185,7 @@ export default function SelectionMenu({ onAction, config = {} }: SelectionMenuPr
           aria-label="Get a detailed explanation of the selected text"
           role="menuitem"
         >
-          <span className={styles.icon} aria-hidden="true">🤖</span>
+          <BookOpenText className={styles.icon} size={16} aria-hidden="true" />
           <span className={styles.label}>Explain</span>
           <span className={styles.shortcut} aria-hidden="true">⌘E</span>
         </button>
@@ -196,7 +197,7 @@ export default function SelectionMenu({ onAction, config = {} }: SelectionMenuPr
           aria-label="Simplify the selected text in easier terms"
           role="menuitem"
         >
-          <span className={styles.icon} aria-hidden="true">📝</span>
+          <Lightbulb className={styles.icon} size={16} aria-hidden="true" />
           <span className={styles.label}>Simplify</span>
           <span className={styles.shortcut} aria-hidden="true">⌘S</span>
         </button>
@@ -208,7 +209,7 @@ export default function SelectionMenu({ onAction, config = {} }: SelectionMenuPr
           aria-label="Show a practical code example of the selected concept"
           role="menuitem"
         >
-          <span className={styles.icon} aria-hidden="true">💡</span>
+          <Code2 className={styles.icon} size={16} aria-hidden="true" />
           <span className={styles.label}>Example</span>
           <span className={styles.shortcut} aria-hidden="true">⌘X</span>
         </button>
@@ -220,7 +221,7 @@ export default function SelectionMenu({ onAction, config = {} }: SelectionMenuPr
           aria-label="Generate quiz questions about the selected concept"
           role="menuitem"
         >
-          <span className={styles.icon} aria-hidden="true">❓</span>
+          <HelpCircle className={styles.icon} size={16} aria-hidden="true" />
           <span className={styles.label}>Quiz Me</span>
           <span className={styles.shortcut} aria-hidden="true">⌘Q</span>
         </button>

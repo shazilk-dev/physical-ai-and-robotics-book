@@ -299,15 +299,31 @@ export default function ChatWidget() {
     window.location.href = docPath;
   };
 
-  // Get action badge info
+  // Get action badge info with Lucide icons
   const getActionBadge = (action: Message["action"]) => {
     if (!action) return null;
 
     const badges = {
-      explain: { icon: "🤖", label: "Detailed Explanation", color: "#667eea" },
-      simplify: { icon: "📝", label: "Simplified", color: "#48bb78" },
-      example: { icon: "💡", label: "Code Example", color: "#f6ad55" },
-      quiz: { icon: "❓", label: "Quiz Mode", color: "#ed64a6" },
+      explain: {
+        Icon: BookOpen,
+        label: "Detailed Explanation",
+        color: "#667eea"
+      },
+      simplify: {
+        Icon: Sparkles,
+        label: "Simplified",
+        color: "#48bb78"
+      },
+      example: {
+        Icon: Bot,
+        label: "Code Example",
+        color: "#f6ad55"
+      },
+      quiz: {
+        Icon: MessageCircle,
+        label: "Quiz Mode",
+        color: "#ed64a6"
+      },
     };
 
     return badges[action];
@@ -346,7 +362,7 @@ export default function ChatWidget() {
                     className={styles.actionBadge}
                     style={{ backgroundColor: actionBadge.color }}
                   >
-                    <span className={styles.badgeIcon}>{actionBadge.icon}</span>
+                    <actionBadge.Icon className={styles.badgeIcon} size={14} />
                     <span className={styles.badgeLabel}>{actionBadge.label}</span>
                   </div>
                 )}
@@ -468,39 +484,48 @@ export default function ChatWidget() {
                   aria-label="Select AI provider"
                   title={`Current: ${LLM_PROVIDERS.find(p => p.value === provider)?.name}`}
                 >
-                  <Sparkles size={20} />
-                  <span className={styles.providerButtonLabel}>
-                    {LLM_PROVIDERS.find(p => p.value === provider)?.icon}
+                  {(() => {
+                    const currentProvider = LLM_PROVIDERS.find(p => p.value === provider);
+                    const IconComponent = currentProvider?.Icon;
+                    return IconComponent ? <IconComponent size={16} /> : null;
+                  })()}
+                  <span style={{ fontSize: '13px', fontWeight: 500 }}>
+                    {LLM_PROVIDERS.find(p => p.value === provider)?.name}
                   </span>
                 </button>
 
                 {showProviderMenu && (
                   <div className={styles.providerMenu}>
-                    <div className={styles.providerMenuHeader}>AI Provider</div>
-                    {LLM_PROVIDERS.map((p) => (
-                      <button
-                        key={p.value}
-                        className={`${styles.providerOption} ${
-                          provider === p.value ? styles.active : ''
-                        }`}
-                        onClick={() => {
-                          setProvider(p.value);
-                          setShowProviderMenu(false);
-                        }}
-                        style={{
-                          borderLeft: provider === p.value ? `3px solid ${p.color}` : 'none'
-                        }}
-                      >
-                        <span className={styles.providerIcon}>{p.icon}</span>
-                        <div className={styles.providerInfo}>
-                          <div className={styles.providerName}>{p.name}</div>
-                          <div className={styles.providerDesc}>{p.description}</div>
-                        </div>
-                        {provider === p.value && (
-                          <span className={styles.checkmark}>✓</span>
-                        )}
-                      </button>
-                    ))}
+                    <div className={styles.providerMenuHeader}>
+                      <Sparkles size={12} />
+                      AI Provider
+                    </div>
+                    {LLM_PROVIDERS.map((p) => {
+                      const ProviderIcon = p.Icon;
+                      return (
+                        <button
+                          key={p.value}
+                          className={`${styles.providerOption} ${
+                            provider === p.value ? styles.active : ''
+                          }`}
+                          onClick={() => {
+                            setProvider(p.value);
+                            setShowProviderMenu(false);
+                          }}
+                        >
+                          <div className={styles.providerIcon}>
+                            <ProviderIcon size={18} />
+                          </div>
+                          <div className={styles.providerInfo}>
+                            <div className={styles.providerName}>{p.name}</div>
+                            <div className={styles.providerDesc}>{p.description}</div>
+                          </div>
+                          {provider === p.value && (
+                            <span className={styles.checkmark}>✓</span>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>

@@ -22,13 +22,14 @@
 }
 
 .menuContent {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #ffffff;
   border-radius: 12px;
-  padding: 8px;
+  padding: 6px;
   display: flex;
-  gap: 6px;
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  gap: 4px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12),
+              0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(10px);
 }
 
@@ -36,53 +37,87 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.95);
-  border: none;
+  background: var(--ifm-color-emphasis-50);
+  border: 1px solid var(--ifm-color-emphasis-200);
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  min-width: 70px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 72px;
   font-family: inherit;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.menuButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.menuButton:hover::before {
+  opacity: 1;
 }
 
 .menuButton:hover {
   background: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: var(--ifm-color-emphasis-300);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
 .menuButton:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
 
 .icon {
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1;
+  color: var(--ifm-color-emphasis-800);
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.menuButton:hover .icon {
+  color: #667eea;
+  transform: scale(1.1);
 }
 
 .label {
   font-size: 11px;
   font-weight: 600;
-  color: #4a5568;
+  color: var(--ifm-color-emphasis-700);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  position: relative;
+  z-index: 1;
+  transition: color 0.2s ease;
+}
+
+.menuButton:hover .label {
+  color: var(--ifm-color-emphasis-900);
 }
 
 .menuArrow {
   position: absolute;
-  bottom: -8px;
+  bottom: -7px;
   left: 50%;
   transform: translateX(-50%);
   width: 0;
   height: 0;
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-  border-top: 8px solid #667eea;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 7px solid #ffffff;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
 }
 
 .hint {
@@ -110,27 +145,47 @@
 }
 
 /* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .menuContent {
-    background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-  }
+[data-theme="dark"] .menuContent {
+  background: #1e293b;
+  border: 1px solid #334155;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4),
+              0 4px 12px rgba(0, 0, 0, 0.3);
+}
 
-  .menuButton {
-    background: rgba(45, 55, 72, 0.95);
-  }
+[data-theme="dark"] .menuButton {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
 
-  .menuButton:hover {
-    background: rgba(45, 55, 72, 1);
-  }
+[data-theme="dark"] .menuButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
 
-  .label {
-    color: #cbd5e0;
-  }
+[data-theme="dark"] .icon {
+  color: #cbd5e0;
+}
 
-  .hint {
-    background: rgba(26, 32, 44, 0.95);
-  }
+[data-theme="dark"] .menuButton:hover .icon {
+  color: #818cf8;
+}
+
+[data-theme="dark"] .label {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .menuButton:hover .label {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .menuArrow {
+  border-top-color: #1e293b;
+}
+
+[data-theme="dark"] .hint {
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Mobile adjustments */

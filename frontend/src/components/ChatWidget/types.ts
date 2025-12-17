@@ -3,6 +3,17 @@
  * Supports personalized conversation modes and user preferences
  */
 
+import {
+  LucideIcon,
+  Zap,
+  BookOpen,
+  GraduationCap,
+  MessageSquare,
+  Bot,
+  Sparkles,
+  Star,
+} from 'lucide-react';
+
 /**
  * Response mode determines the style and length of AI responses
  */
@@ -50,7 +61,7 @@ export const DEFAULT_SETTINGS: ChatSettings = {
  */
 export interface ResponseModeInfo {
   value: ResponseMode;
-  icon: string;
+  Icon: LucideIcon;
   label: string;
   description: string;
 }
@@ -61,25 +72,25 @@ export interface ResponseModeInfo {
 export const RESPONSE_MODES: ResponseModeInfo[] = [
   {
     value: 'quick',
-    icon: '⚡',
+    Icon: Zap,
     label: 'Quick',
     description: 'Concise answers (1-2 paragraphs)',
   },
   {
     value: 'detailed',
-    icon: '📚',
+    Icon: BookOpen,
     label: 'Detailed',
     description: 'Comprehensive explanations',
   },
   {
     value: 'tutorial',
-    icon: '🎓',
+    Icon: GraduationCap,
     label: 'Tutorial',
     description: 'Step-by-step guidance',
   },
   {
     value: 'socratic',
-    icon: '💭',
+    Icon: MessageSquare,
     label: 'Socratic',
     description: 'Guided questions to help you learn',
   },
@@ -129,7 +140,7 @@ export const LANGUAGE_STYLES: LanguageStyleInfo[] = [
 export interface LLMProviderInfo {
   value: LLMProvider;
   name: string;
-  icon: string;
+  Icon: LucideIcon;
   description: string;
   color: string;
 }
@@ -141,21 +152,21 @@ export const LLM_PROVIDERS: LLMProviderInfo[] = [
   {
     value: 'openai',
     name: 'OpenAI',
-    icon: '🤖',
+    Icon: Bot,
     description: 'GPT-4o-mini (Best quality, paid)',
     color: '#10a37f',
   },
   {
     value: 'gemini',
     name: 'Gemini',
-    icon: '✨',
+    Icon: Sparkles,
     description: 'Google Gemini 1.5 Flash (Free)',
     color: '#4285f4',
   },
   {
     value: 'qwen',
     name: 'Qwen',
-    icon: '🌟',
+    Icon: Star,
     description: 'Alibaba Qwen (Affordable)',
     color: '#ff6a00',
   },
