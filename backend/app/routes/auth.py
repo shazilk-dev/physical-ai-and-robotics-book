@@ -28,18 +28,25 @@ def get_auth_service():
 async def sign_up(data: SignUpRequest, response: Response):
     """Sign up with email and password"""
     auth_service = get_auth_service()
-    
+
+    # Validate input
+    if not data.email or not data.password or not data.name:
+        raise HTTPException(status_code=400, detail="Email, password, and name are required")
+
+    if len(data.password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
+
     # Create user
     user = await auth_service.create_user(data.email, data.password, data.name)
     if not user:
-        raise HTTPException(status_code=400, detail="Email already exists")
-    
+        raise HTTPException(status_code=400, detail="An account with this email already exists")
+
     # Create token
     token = auth_service.create_access_token(user['id'], user['email'])
-    
+
     # Create session
     await auth_service.create_session(user['id'], token)
-    
+
     # Set cookie
     response.set_cookie(
         key="auth-token",
@@ -48,7 +55,7 @@ async def sign_up(data: SignUpRequest, response: Response):
         max_age=7 * 24 * 60 * 60,  # 7 days
         samesite="lax"
     )
-    
+
     # Convert snake_case to camelCase for response
     user_response = {
         "id": user['id'],
@@ -63,7 +70,7 @@ async def sign_up(data: SignUpRequest, response: Response):
         "ros2Experience": user.get('ros2_experience'),
         "roboticsExperience": user.get('robotics_experience'),
     }
-    
+
     return {
         "token": token,
         "user": user_response
@@ -73,18 +80,22 @@ async def sign_up(data: SignUpRequest, response: Response):
 async def sign_in(data: SignInRequest, response: Response):
     """Sign in with email and password"""
     auth_service = get_auth_service()
-    
+
+    # Validate input
+    if not data.email or not data.password:
+        raise HTTPException(status_code=400, detail="Email and password are required")
+
     # Verify credentials
     user = await auth_service.verify_user(data.email, data.password)
     if not user:
-        raise HTTPException(status_code=401, detail="Invalid email or password")
-    
+        raise HTTPException(status_code=401, detail="Invalid email or password. Please check your credentials and try again.")
+
     # Create token
     token = auth_service.create_access_token(user['id'], user['email'])
-    
+
     # Create session
     await auth_service.create_session(user['id'], token)
-    
+
     # Set cookie
     response.set_cookie(
         key="auth-token",
@@ -93,7 +104,7 @@ async def sign_in(data: SignInRequest, response: Response):
         max_age=7 * 24 * 60 * 60,  # 7 days
         samesite="lax"
     )
-    
+
     # Convert snake_case to camelCase
     user_response = {
         "id": user['id'],
@@ -108,7 +119,7 @@ async def sign_in(data: SignInRequest, response: Response):
         "ros2Experience": user.get('ros2_experience'),
         "roboticsExperience": user.get('robotics_experience'),
     }
-    
+
     return {
         "token": token,
         "user": user_response

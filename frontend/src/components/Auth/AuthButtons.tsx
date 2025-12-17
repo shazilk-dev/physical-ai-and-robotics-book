@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import LoginModal from "./LoginModal";
 import SignupModal from "./SignupModal";
+import ProfileModal from "./ProfileModal";
 import styles from "./AuthButtons.module.css";
 
 // Backend URL - detect environment safely in browser
@@ -46,6 +47,7 @@ interface Session {
 export default function AuthButtons() {
   const [showLogin, setShowLogin] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [showMenu, setShowMenu] = useState(false);
@@ -149,6 +151,28 @@ export default function AuthButtons() {
               </div>
             </div>
             <hr className={styles.dropdownDivider} />
+            <button
+              className={styles.dropdownItem}
+              onClick={() => {
+                setShowProfile(true);
+                setShowMenu(false);
+              }}
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              View Profile
+            </button>
             <button className={styles.dropdownItem} onClick={handleSignOut}>
               <svg
                 width="16"
@@ -168,6 +192,12 @@ export default function AuthButtons() {
             </button>
           </div>
         )}
+
+        <ProfileModal
+          isOpen={showProfile}
+          onClose={() => setShowProfile(false)}
+          user={session.user}
+        />
       </div>
     );
   }
