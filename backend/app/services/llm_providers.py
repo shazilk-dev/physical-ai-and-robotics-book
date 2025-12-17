@@ -115,7 +115,13 @@ class OpenAIProvider(BaseLLMProvider):
 
 
 class GeminiProvider(BaseLLMProvider):
-    """Google Gemini API provider (Free tier: 60 req/min, 1500 req/day)"""
+    """
+    Google Gemini API provider (Free tier: 60 req/min, 1500 req/day)
+
+    Models (Updated December 2025):
+    - Chat: gemini-2.0-flash-exp (replaces deprecated gemini-1.5-flash)
+    - Embeddings: gemini-embedding-001 (replaces text-embedding-004)
+    """
 
     def __init__(self, api_key: str):
         """
@@ -129,9 +135,9 @@ class GeminiProvider(BaseLLMProvider):
             self.genai = genai
             genai.configure(api_key=api_key)
 
-            # Models
-            self.embedding_model = "models/text-embedding-004"
-            self.chat_model = "gemini-1.5-flash"
+            # Models (Updated December 2025)
+            self.embedding_model = "models/gemini-embedding-001"  # Current embedding model
+            self.chat_model = "gemini-2.0-flash-exp"  # Updated from deprecated gemini-1.5-flash
 
             print(f"[OK] Gemini Provider initialized")
             print(f"   Embedding Model: {self.embedding_model}")
@@ -144,11 +150,12 @@ class GeminiProvider(BaseLLMProvider):
             )
 
     def generate_embedding(self, text: str) -> List[float]:
-        """Generate 768-dim embedding using text-embedding-004"""
+        """Generate 768-dim embedding using gemini-embedding-001"""
         result = self.genai.embed_content(
             model=self.embedding_model,
             content=text,
-            task_type="retrieval_document"
+            task_type="retrieval_document",
+            output_dimensionality=768  # Specify 768 dims (default is 3072)
         )
         return result['embedding']
 
@@ -158,7 +165,7 @@ class GeminiProvider(BaseLLMProvider):
         max_tokens: int,
         temperature: float
     ) -> str:
-        """Generate chat completion using Gemini 1.5 Flash"""
+        """Generate chat completion using Gemini 2.0 Flash"""
         # Convert OpenAI message format to Gemini format
         prompt = self._convert_messages_to_prompt(messages)
 
@@ -197,7 +204,7 @@ class GeminiProvider(BaseLLMProvider):
         return "\n".join(prompt_parts)
 
     def get_embedding_dimension(self) -> int:
-        """Gemini text-embedding-004 uses 768 dimensions"""
+        """Gemini gemini-embedding-001 configured for 768 dimensions"""
         return 768
 
     def get_provider_name(self) -> str:
