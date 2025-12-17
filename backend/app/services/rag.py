@@ -180,29 +180,62 @@ class RAGService:
 
         # Initialize Qdrant client
         self.qdrant_client = QdrantClient(url=qdrant_url, api_key=qdrant_key)
-        self.collection_name = os.getenv("QDRANT_COLLECTION_NAME", "physical_ai_book")
 
         # Get embedding dimension from provider
         self.embedding_dimension = self.llm_provider.get_embedding_dimension()
 
+        # Generate provider-specific collection name
+        provider_suffix = os.getenv("LLM_PROVIDER", "openai").lower()
+        base_collection = os.getenv("QDRANT_COLLECTION_NAME", "physical_ai_book")
+        self.collection_name = f"{base_collection}_{provider_suffix}"
+
         print(f"   Collection: {self.collection_name}")
         print(f"   Embedding Dimension: {self.embedding_dimension}")
+
+        # Ensure collection exists with correct dimension
+        self._ensure_collection_exists()
+
         print(f"✅ RAG Service initialized with {self.llm_provider.get_provider_name()}")
-        
-    def create_collection(self):
-        """Create Qdrant collection if it doesn't exist"""
+
+    def _ensure_collection_exists(self):
+        """
+        Ensure collection exists with correct dimension for current provider.
+        Creates collection if it doesn't exist.
+        Validates dimension if it does exist.
+        """
         try:
-            self.qdrant_client.get_collection(self.collection_name)
-            print(f"Collection '{self.collection_name}' already exists")
-        except:
+            # Try to get existing collection
+            collection_info = self.qdrant_client.get_collection(self.collection_name)
+
+            # Validate dimension matches current provider
+            existing_dimension = collection_info.config.params.vectors.size
+
+            if existing_dimension != self.embedding_dimension:
+                print(f"⚠️  Warning: Collection '{self.collection_name}' exists with dimension {existing_dimension}")
+                print(f"   Current provider needs dimension {self.embedding_dimension}")
+                print(f"   You may need to re-seed this collection or use a different provider")
+            else:
+                print(f"✅ Collection '{self.collection_name}' exists with correct dimension {self.embedding_dimension}")
+
+        except Exception:
+            # Collection doesn't exist, create it
+            print(f"📦 Creating new collection '{self.collection_name}'...")
             self.qdrant_client.create_collection(
                 collection_name=self.collection_name,
                 vectors_config=VectorParams(
-                    size=self.embedding_dimension,  # Dynamic dimension based on provider
+                    size=self.embedding_dimension,
                     distance=Distance.COSINE
                 )
             )
-            print(f"Created collection '{self.collection_name}' with dimension {self.embedding_dimension}")
+            print(f"✅ Created collection with dimension {self.embedding_dimension}")
+            print(f"⚠️  Collection is empty - run 'python scripts/seed_vector_db.py' to index content")
+
+    def create_collection(self):
+        """
+        Create Qdrant collection if it doesn't exist.
+        (Deprecated: Use _ensure_collection_exists instead, called automatically in __init__)
+        """
+        self._ensure_collection_exists()
     
     def generate_embedding(self, text: str) -> List[float]:
         """Generate embedding for text using configured LLM provider"""

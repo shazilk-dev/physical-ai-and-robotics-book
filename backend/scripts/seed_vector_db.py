@@ -213,14 +213,36 @@ def main():
     """Main function"""
     print("🚀 Starting Vector Database Seeding")
     print("=" * 60)
-    
+
+    # Show which provider is being used
+    provider_name = os.getenv("LLM_PROVIDER", "openai").upper()
+    print(f"\n🤖 LLM Provider: {provider_name}")
+
     # Initialize RAG service
     print("\n🔧 Initializing RAG service...")
     rag_service = get_rag_service()
-    
-    # Create collection if not exists
-    print(f"🗄️  Creating collection: {rag_service.collection_name}")
-    rag_service.create_collection()
+
+    # Check if collection already has data
+    try:
+        collection_info = rag_service.qdrant_client.get_collection(
+            rag_service.collection_name
+        )
+        if collection_info.points_count > 0:
+            print(f"\n⚠️  Collection '{rag_service.collection_name}' already has {collection_info.points_count} points")
+            response = input("Do you want to re-seed (this will delete existing data)? [y/N]: ")
+            if response.lower() != 'y':
+                print("❌ Seeding cancelled")
+                return
+
+            # Delete and recreate collection
+            print(f"🗑️  Deleting existing collection...")
+            rag_service.qdrant_client.delete_collection(rag_service.collection_name)
+            print(f"📦 Recreating collection...")
+            rag_service.create_collection()
+    except Exception:
+        # Collection doesn't exist, create it
+        print(f"📦 Creating collection: {rag_service.collection_name}")
+        rag_service.create_collection()
     
     # Find base directory
     script_dir = Path(__file__).parent
