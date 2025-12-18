@@ -585,13 +585,6 @@ export default function ChatWidget() {
               >
                 <Settings size={20} />
               </button>
-              <button
-                className={styles.closeButton}
-                onClick={() => setIsOpen(false)}
-                aria-label="Close chat"
-              >
-                <X size={20} />
-              </button>
             </div>
           </div>
 

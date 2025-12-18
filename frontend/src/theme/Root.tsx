@@ -1,6 +1,6 @@
 /**
  * Root Theme Wrapper
- * Adds ChatWidget to all pages
+ * Adds NavigationFAB and ChatWidget to all pages
  */
 
 import React from "react";
@@ -13,7 +13,13 @@ export default function Root({ children }) {
       <BrowserOnly>
         {() => {
           const ChatWidget = require("@site/src/components/ChatWidget/ChatWidget").default;
-          return <ChatWidget />;
+          const NavigationFAB = require("@site/src/components/NavigationFAB/NavigationFAB").default;
+          return (
+            <>
+              <NavigationFAB />
+              <ChatWidget />
+            </>
+          );
         }}
       </BrowserOnly>
     </>
