@@ -8,6 +8,7 @@ interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSwitchToSignup: () => void;
+  onSuccess?: () => void;
 }
 
 export default function LoginModal({
