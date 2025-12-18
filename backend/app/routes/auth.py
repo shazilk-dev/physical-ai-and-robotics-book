@@ -11,6 +11,7 @@ from app.models.user import (
 )
 from app.services.auth import AuthService
 from app.config.database import get_db_pool
+from app.config.settings import settings
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -23,6 +24,27 @@ def get_auth_service():
     if db_pool is None:
         db_pool = get_db_pool()
     return AuthService(db_pool)
+
+def get_cookie_settings():
+    """
+    Get cookie settings based on environment.
+
+    For production (cross-domain):
+    - SameSite=None (required for cross-site cookies)
+    - Secure=True (required with SameSite=None)
+
+    For development (same-domain):
+    - SameSite=Lax (more secure for same-site)
+    - Secure=False (allows HTTP on localhost)
+    """
+    is_production = settings.ENVIRONMENT == "production"
+
+    return {
+        "httponly": True,
+        "max_age": 7 * 24 * 60 * 60,  # 7 days
+        "samesite": "none" if is_production else "lax",
+        "secure": is_production,  # True in production, False in dev
+    }
 
 @router.post("/sign-up/email")
 async def sign_up(data: SignUpRequest, response: Response):
@@ -47,13 +69,12 @@ async def sign_up(data: SignUpRequest, response: Response):
     # Create session
     await auth_service.create_session(user['id'], token)
 
-    # Set cookie
+    # Set cookie with dynamic settings (production vs development)
+    cookie_settings = get_cookie_settings()
     response.set_cookie(
         key="auth-token",
         value=token,
-        httponly=True,
-        max_age=7 * 24 * 60 * 60,  # 7 days
-        samesite="lax"
+        **cookie_settings
     )
 
     # Convert snake_case to camelCase for response
@@ -96,13 +117,12 @@ async def sign_in(data: SignInRequest, response: Response):
     # Create session
     await auth_service.create_session(user['id'], token)
 
-    # Set cookie
+    # Set cookie with dynamic settings (production vs development)
+    cookie_settings = get_cookie_settings()
     response.set_cookie(
         key="auth-token",
         value=token,
-        httponly=True,
-        max_age=7 * 24 * 60 * 60,  # 7 days
-        samesite="lax"
+        **cookie_settings
     )
 
     # Convert snake_case to camelCase
@@ -176,7 +196,13 @@ async def get_session(request: Request):
 @router.post("/sign-out")
 async def sign_out(response: Response):
     """Sign out user"""
-    response.delete_cookie("auth-token")
+    # Delete cookie with same settings used to create it
+    cookie_settings = get_cookie_settings()
+    response.delete_cookie(
+        key="auth-token",
+        samesite=cookie_settings["samesite"],
+        secure=cookie_settings["secure"]
+    )
     return {"success": True}
 
 @router.post("/user/update-profile")
