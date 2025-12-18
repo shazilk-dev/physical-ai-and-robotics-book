@@ -103,6 +103,7 @@ export default function ChatWidget() {
   const [settings, setSettings] = useState<ChatSettings>(DEFAULT_SETTINGS);
   const [provider, setProvider] = useState<LLMProvider>(DEFAULT_PROVIDER);
   const [showProviderMenu, setShowProviderMenu] = useState(false);
+  const [viewportHeight, setViewportHeight] = useState(typeof window !== 'undefined' ? window.innerHeight : 0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -159,6 +160,52 @@ export default function ChatWidget() {
       console.error('Failed to save provider:', error);
     }
   }, [provider]);
+
+  // Handle virtual keyboard on mobile - prevents keyboard from hiding input
+  useEffect(() => {
+    // Only run in browser
+    if (typeof window === 'undefined') return;
+
+    const handleResize = () => {
+      // Use visualViewport API for modern browsers (iOS 15.4+, Android Chrome 108+)
+      if (window.visualViewport) {
+        setViewportHeight(window.visualViewport.height);
+        // Set CSS variable for fallback in CSS
+        document.documentElement.style.setProperty(
+          '--vh',
+          `${window.visualViewport.height * 0.01}px`
+        );
+      } else {
+        // Fallback for older browsers
+        setViewportHeight(window.innerHeight);
+        document.documentElement.style.setProperty(
+          '--vh',
+          `${window.innerHeight * 0.01}px`
+        );
+      }
+    };
+
+    // Initial setup
+    handleResize();
+
+    // Listen to viewport changes (keyboard show/hide)
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleResize);
+      window.visualViewport.addEventListener('scroll', handleResize);
+    } else {
+      window.addEventListener('resize', handleResize);
+    }
+
+    // Cleanup listeners
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleResize);
+        window.visualViewport.removeEventListener('scroll', handleResize);
+      } else {
+        window.removeEventListener('resize', handleResize);
+      }
+    };
+  }, []);
 
   // Handle text selection actions
   const handleSelectionAction = (context: SelectionContext) => {

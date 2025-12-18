@@ -54,6 +54,8 @@
   border: 1px solid var(--ifm-color-emphasis-200);
   overflow: hidden;
   animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Safe area insets for notched devices */
+  padding-bottom: max(0px, env(safe-area-inset-bottom));
 }
 
 @keyframes slideUp {
@@ -113,9 +115,9 @@
   background: var(--ifm-color-emphasis-100);
   border: none;
   color: var(--ifm-color-emphasis-700);
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 44px;  /* Was 32px - WCAG compliant touch target */
+  height: 44px; /* Was 32px - WCAG compliant touch target */
+  border-radius: 10px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -133,9 +135,9 @@
   background: var(--ifm-color-emphasis-100);
   border: none;
   color: var(--ifm-color-emphasis-700);
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 44px;  /* Was 32px - WCAG compliant touch target */
+  height: 44px; /* Was 32px - WCAG compliant touch target */
+  border-radius: 10px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -324,7 +326,8 @@
 }
 
 .citationButton {
-  padding: 6px 12px;
+  padding: 8px 14px;  /* Increased from 6px 12px */
+  min-height: 36px;   /* Adequate touch target */
   background: var(--ifm-color-primary);
   color: white;
   border: none;
@@ -388,6 +391,8 @@
   padding: 16px;
   background: var(--ifm-background-surface-color);
   border-top: 1px solid var(--ifm-color-emphasis-200);
+  /* Safe area insets for notched devices */
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
 }
 
 .input {
@@ -431,8 +436,8 @@
 
 /* Send Button - Clean Professional */
 .sendButton {
-  width: 42px;
-  height: 42px;
+  width: 48px;  /* Was 42px - WCAG compliant touch target */
+  height: 48px; /* Was 42px - WCAG compliant touch target */
   border-radius: 10px;
   background: #0f172a;
   border: 1px solid rgba(15, 23, 42, 0.1);
@@ -487,21 +492,67 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .chatPanel {
-    width: calc(100vw - 24px);
-    height: calc(100vh - 110px);
-    right: 12px;
-    bottom: 78px;
+    /* Full-screen bottom sheet on mobile */
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+
+    /* Dynamic viewport height (supported iOS 15.4+, Android Chrome 108+) */
+    height: 100dvh; /* Modern browsers */
+    height: calc(var(--vh, 1vh) * 100); /* Fallback with JS variable */
+
+    /* Bottom sheet style - rounded top corners only */
+    border-radius: 16px 16px 0 0;
+
+    /* Slide-up animation */
+    animation: slideUpSheet 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .floatingButton {
-    bottom: 12px;
-    right: 12px;
-    width: 50px;
-    height: 50px;
+    /* Center position for one-handed use */
+    bottom: max(20px, env(safe-area-inset-bottom));
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+
+    /* Larger touch target (WCAG compliance) */
+    width: 56px;  /* Was 50px */
+    height: 56px; /* Was 50px */
+
+    /* Enhanced shadow for better visibility */
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.24),
+                0 2px 8px rgba(0, 0, 0, 0.12);
+  }
+
+  /* Maintain transform on hover */
+  .floatingButton:hover {
+    transform: translateX(-50%) translateY(-2px);
+  }
+
+  .floatingButton:active {
+    transform: translateX(-50%) scale(0.96);
   }
 
   .messageBody {
-    max-width: 85%;
+    max-width: 90%; /* Was 85% - better readability */
+  }
+
+  .messageText {
+    font-size: 15px; /* Was 14px - better readability on mobile */
+    line-height: 1.6; /* Was 1.5 */
+    padding: 12px 16px; /* Was 10px 14px */
+  }
+}
+
+/* Slide-up animation for bottom sheet */
+@keyframes slideUpSheet {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
   }
 }
 
@@ -689,7 +740,8 @@
 .providerButton {
   background: var(--ifm-color-emphasis-100);
   border: 1px solid var(--ifm-color-emphasis-200);
-  padding: 6px 12px;
+  padding: 8px 14px;  /* Increased from 6px 12px */
+  min-height: 44px;   /* WCAG compliant touch target */
   cursor: pointer;
   color: var(--ifm-color-emphasis-700);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -947,12 +999,16 @@
 /* Mobile optimizations for provider UI */
 @media (max-width: 768px) {
   .providerMenu {
-    min-width: 240px;
-    right: -8px;
+    right: 0;
+    left: 0;
+    margin: 0 12px;
+    min-width: auto; /* Remove minimum width */
+    max-width: calc(100vw - 24px); /* Prevent overflow on small screens */
   }
 
   .providerOption {
-    padding: 10px 14px;
+    padding: 12px 16px;  /* Increased for better touch */
+    min-height: 52px;    /* Larger touch targets on mobile */
   }
 
   .providerName {
