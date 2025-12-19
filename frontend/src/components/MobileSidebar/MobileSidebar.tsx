@@ -1,18 +1,17 @@
 /**
- * NavigationFAB Component
- * Mobile-only floating action button for sidebar navigation
- * Appears on devices <=996px, programmatically opens Docusaurus sidebar
+ * MobileSidebar Component
+ * Always-visible collapsed sidebar tab for mobile devices
+ * Opens Docusaurus native sidebar with full chapter index
  */
 
 import React, { useState, useEffect } from "react";
 import { BookOpen } from "lucide-react";
-import styles from "./NavigationFAB.module.css";
+import styles from "./MobileSidebar.module.css";
 
-export default function NavigationFAB() {
+export default function MobileSidebar() {
   const [isMobile, setIsMobile] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Detect mobile viewport (<=996px = Docusaurus mobile breakpoint)
+  // Mobile detection (<=996px = Docusaurus mobile breakpoint)
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -25,12 +24,11 @@ export default function NavigationFAB() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const toggleSidebar = () => {
-    // Trigger Docusaurus sidebar toggle by clicking hamburger menu
+  // Toggle Docusaurus native sidebar
+  const openSidebar = () => {
     const sidebarButton = document.querySelector('.navbar__toggle');
     if (sidebarButton instanceof HTMLElement) {
       sidebarButton.click();
-      setIsSidebarOpen(!isSidebarOpen);
     }
   };
 
@@ -39,12 +37,13 @@ export default function NavigationFAB() {
 
   return (
     <button
-      className={styles.navigationFAB}
-      onClick={toggleSidebar}
-      aria-label="Open navigation sidebar"
-      aria-expanded={isSidebarOpen}
+      className={styles.sidebarTab}
+      onClick={openSidebar}
+      aria-label="Open table of contents"
+      title="Table of Contents"
     >
-      <BookOpen size={24} strokeWidth={2.5} />
+      <BookOpen size={22} strokeWidth={2.5} />
+      <span className={styles.tabLabel}>INDEX</span>
     </button>
   );
 }

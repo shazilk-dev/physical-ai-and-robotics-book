@@ -95,12 +95,6 @@ const config: Config = {
       },
       items: [
         {
-          type: "docSidebar",
-          sidebarId: "bookSidebar",
-          position: "left",
-          label: "Read Book",
-        },
-        {
           href: "https://github.com/shazilk-dev/physical-ai-and-robotics-book",
           label: "GitHub",
           position: "right",

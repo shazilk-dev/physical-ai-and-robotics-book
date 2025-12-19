@@ -1,0 +1,50 @@
+/**
+ * Mobile Navbar Customization
+ * Clean navbar on mobile - hide redundant items
+ */
+
+/* Hide GitHub link from navbar on mobile (appears in hamburger menu) */
+@media (max-width: 996px) {
+  /* Hide navbar items on mobile - they appear in hamburger menu */
+  .navbar__items--right .navbar__item {
+    display: none;
+  }
+
+  /* Keep auth buttons visible in navbar */
+  .navbar__items--right > div[class*="authButtonsContainer"] {
+    display: flex !important;
+  }
+
+  /* Clean navbar spacing on mobile */
+  .navbar__inner {
+    padding: 0 12px;
+  }
+
+  .navbar__brand {
+    margin-right: auto;
+  }
+
+  .navbar__toggle {
+    margin-right: 12px;
+  }
+}
+
+/* Extra small mobile - even cleaner */
+@media (max-width: 640px) {
+  .navbar__title {
+    font-size: 14px;
+  }
+
+  .navbar__logo {
+    width: 32px;
+    height: 32px;
+  }
+
+  .navbar__inner {
+    padding: 0 8px;
+  }
+
+  .navbar__toggle {
+    margin-right: 8px;
+  }
+}

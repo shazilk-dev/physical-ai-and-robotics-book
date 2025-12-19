@@ -534,6 +534,11 @@
     transform: translateX(-50%) scale(0.96);
   }
 
+  /* Hide floating button when chat is open on mobile - only header X visible */
+  .floatingButton.open {
+    display: none;
+  }
+
   .messageBody {
     max-width: 90%; /* Was 85% - better readability */
   }

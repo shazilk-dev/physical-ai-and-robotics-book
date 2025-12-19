@@ -1,0 +1,161 @@
+/* MobileSidebar - Always-Visible Collapsed Tab on Mobile */
+
+.sidebarTab {
+  /* Positioning - Fixed on left side */
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+
+  /* Size & Layout */
+  width: 48px;
+  height: 100px;
+  padding: 12px 8px;
+
+  /* Visual Style */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+  color: white;
+  cursor: pointer;
+
+  /* Elevation */
+  box-shadow: 2px 0 12px rgba(102, 126, 234, 0.3),
+              2px 0 4px rgba(0, 0, 0, 0.1);
+
+  /* Transitions */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Z-index - Below chatbot but above content */
+  z-index: 999;
+
+  /* Layout - Vertical orientation */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  /* Typography */
+  font-family: var(--ifm-font-family-base);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+
+  /* Animation - Slide in from left */
+  animation: slideInFromLeft 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hover State */
+.sidebarTab:hover {
+  width: 56px;
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  box-shadow: 3px 0 16px rgba(102, 126, 234, 0.4),
+              3px 0 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Active (Press) State */
+.sidebarTab:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+/* Tab Label */
+.tabLabel {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Dark Mode */
+[data-theme="dark"] .sidebarTab {
+  background: linear-gradient(135deg, #a8edea 0%, #667eea 100%);
+  box-shadow: 2px 0 12px rgba(168, 237, 234, 0.3),
+              2px 0 4px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .sidebarTab:hover {
+  background: linear-gradient(135deg, #667eea 0%, #a8edea 100%);
+  box-shadow: 3px 0 16px rgba(168, 237, 234, 0.5),
+              3px 0 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Slide-in Animation */
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-48px) translateY(-50%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) translateY(-50%);
+  }
+}
+
+/* Desktop - Hide (>996px) */
+@media (min-width: 997px) {
+  .sidebarTab {
+    display: none;
+  }
+}
+
+/* Accessibility - Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .sidebarTab {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Small Screens - Adjust size */
+@media (max-width: 374px) {
+  .sidebarTab {
+    width: 44px;
+    height: 90px;
+    font-size: 9px;
+  }
+
+  .sidebarTab:hover {
+    width: 48px;
+  }
+}
+
+/* Landscape - Move to top */
+@media (max-width: 996px) and (orientation: landscape) {
+  .sidebarTab {
+    top: 80px;
+    left: 8px;
+    transform: translateY(0);
+    width: 80px;
+    height: 44px;
+    flex-direction: row;
+    padding: 8px 12px;
+    border-radius: 12px;
+  }
+
+  .sidebarTab:hover {
+    width: 88px;
+    transform: translateY(0);
+  }
+
+  .sidebarTab:active {
+    transform: scale(0.95);
+  }
+
+  .tabLabel {
+    writing-mode: horizontal-tb;
+    text-orientation: initial;
+  }
+
+  @keyframes slideInFromLeft {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}

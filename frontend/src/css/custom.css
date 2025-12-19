@@ -6,6 +6,7 @@
 
 /* Import enhanced navbar and sidebar styles */
 @import "./navbar.css";
+@import "./navbar-mobile.css";
 @import "./sidebar.css";
 
 /* Custom color scheme matching the site theme */
