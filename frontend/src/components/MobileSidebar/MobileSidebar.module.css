@@ -32,10 +32,11 @@
               box-shadow 0.25s ease,
               border-radius 0.3s ease,
               width 0.3s ease,
-              height 0.3s ease;
+              height 0.3s ease,
+              left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 
   /* Performance hint - will animate these properties */
-  will-change: transform, opacity;
+  will-change: transform, opacity, left;
 
   /* Z-index - Above sidebar */
   z-index: 10001;
