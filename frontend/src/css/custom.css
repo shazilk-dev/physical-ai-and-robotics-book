@@ -8,6 +8,7 @@
 @import "./navbar.css";
 @import "./navbar-mobile.css";
 @import "./sidebar.css";
+@import "./sidebar-mobile.css";
 
 /* Custom color scheme matching the site theme */
 :root {

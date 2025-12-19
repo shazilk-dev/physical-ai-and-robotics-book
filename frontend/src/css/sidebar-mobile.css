@@ -1,0 +1,42 @@
+/**
+ * Mobile Sidebar Customization
+ * Separate INDEX tab behavior from hamburger menu
+ */
+
+/* When INDEX tab triggers sidebar, hide navbar items to show only book chapters */
+body[data-index-triggered] .navbar-sidebar__items .navbar__item {
+  display: none !important;
+}
+
+/* When INDEX tab triggers sidebar, hide navbar brand */
+body[data-index-triggered] .navbar-sidebar__brand {
+  display: none !important;
+}
+
+/* Make sidebar drawer full height when opened via INDEX */
+body[data-index-triggered] .navbar-sidebar {
+  padding-top: 0 !important;
+}
+
+/* Show only the menu (book chapters) when triggered by INDEX */
+body[data-index-triggered] .navbar-sidebar .menu {
+  margin-top: 0 !important;
+}
+
+/* Alternative approach: Use CSS to customize mobile sidebar appearance */
+@media (max-width: 996px) {
+  /* Hide navbar items from mobile sidebar drawer - show only book chapters */
+  .navbar-sidebar__items {
+    /* Keep for hamburger menu, will be hidden for INDEX via data attribute */
+  }
+
+  /* Ensure book sidebar (menu) is always visible in mobile drawer */
+  .navbar-sidebar .menu {
+    display: block !important;
+  }
+
+  /* Better spacing for book chapters in mobile drawer */
+  .navbar-sidebar .theme-doc-sidebar-menu {
+    padding: 16px 0;
+  }
+}
