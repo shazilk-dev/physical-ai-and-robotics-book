@@ -66,7 +66,7 @@
 /* Attached State - Sticks to sidebar edge when open */
 .sidebarTab.attached {
   /* Move to right edge of sidebar (sidebar is ~75% width on mobile) */
-  left: calc(75vw - 48px);
+  left: calc(75vw - 48px) !important;
 
   /* Smaller and more compact */
   width: 48px;
@@ -295,7 +295,7 @@
 
   .sidebarTab.attached {
     top: 80px;
-    left: calc(85vw - 48px);
+    left: calc(85vw - 48px) !important;
     transform: translateY(0);
     width: 48px;
     height: 48px;

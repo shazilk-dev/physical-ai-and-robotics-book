@@ -50,6 +50,7 @@ export default function MobileSidebar() {
         const navbarSidebar = document.querySelector('.navbar-sidebar');
         const isOpen = navbarSidebar?.classList.contains('navbar-sidebar--show');
 
+        console.log('[MobileSidebar] Sidebar state:', isOpen ? 'OPEN' : 'CLOSED');
         setIsSidebarOpen(!!isOpen);
 
         if (!isOpen) {
@@ -116,12 +117,19 @@ export default function MobileSidebar() {
   // Only render on mobile
   if (!isMobile) return null;
 
+  console.log('[MobileSidebar] Rendering with state:', {
+    isSidebarOpen,
+    hasAttachedClass: isSidebarOpen,
+    className: `${styles.sidebarTab} ${isSidebarOpen ? styles.attached : ''}`
+  });
+
   return (
     <button
       className={`${styles.sidebarTab} ${isSidebarOpen ? styles.attached : ''}`}
       onClick={toggleSidebar}
       aria-label={isSidebarOpen ? "Close table of contents" : "Open table of contents"}
       title={isSidebarOpen ? "Close" : "Table of Contents"}
+      data-sidebar-open={isSidebarOpen}
     >
       {isSidebarOpen ? (
         <X size={20} strokeWidth={2.5} />
