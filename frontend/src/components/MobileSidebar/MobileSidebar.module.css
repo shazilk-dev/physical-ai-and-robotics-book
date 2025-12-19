@@ -12,23 +12,38 @@
   height: 100px;
   padding: 12px 8px;
 
-  /* Visual Style */
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* Visual Style - Simplified for performance */
+  background: #667eea; /* Solid color instead of gradient on mobile */
   border: none;
   border-top-right-radius: 12px;
   border-bottom-right-radius: 12px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
   color: white;
   cursor: pointer;
 
-  /* Elevation */
-  box-shadow: 2px 0 12px rgba(102, 126, 234, 0.3),
-              2px 0 4px rgba(0, 0, 0, 0.1);
+  /* Elevation - Single shadow for performance */
+  box-shadow: 2px 0 12px rgba(102, 126, 234, 0.35);
 
-  /* Transitions */
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Transitions - GPU accelerated (only transform, opacity, background) */
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.2s ease,
+              background 0.25s ease,
+              box-shadow 0.25s ease,
+              border-radius 0.3s ease,
+              width 0.3s ease,
+              height 0.3s ease;
 
-  /* Z-index - Below drawer/backdrop */
-  z-index: 999;
+  /* Performance hint - will animate these properties */
+  will-change: transform, opacity;
+
+  /* Z-index - Above sidebar */
+  z-index: 10001;
+
+  /* Force GPU acceleration */
+  transform: translateY(-50%) translateZ(0);
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
 
   /* Layout - Vertical orientation */
   display: flex;
@@ -45,6 +60,26 @@
 
   /* Animation - Slide in from left */
   animation: slideInFromLeft 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Attached State - Sticks to sidebar edge when open */
+.sidebarTab.attached {
+  /* Move to right edge of sidebar (sidebar is ~75% width on mobile) */
+  left: calc(75vw - 48px);
+
+  /* Smaller and more compact */
+  width: 48px;
+  height: 48px;
+  padding: 0;
+
+  /* Rounded on all sides for compact look */
+  border-radius: 50%;
+
+  /* Simpler shadow for performance */
+  box-shadow: -2px 0 16px rgba(102, 126, 234, 0.4);
+
+  /* Darker solid color for close state */
+  background: #764ba2;
 }
 
 /* Backdrop Overlay */
@@ -126,17 +161,22 @@
   /* Inherit Docusaurus sidebar styles */
 }
 
-/* Hover State */
-.sidebarTab:hover {
+/* Hover State - Normal (closed) */
+.sidebarTab:hover:not(.attached) {
   width: 56px;
-  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-  box-shadow: 3px 0 16px rgba(102, 126, 234, 0.4),
-              3px 0 8px rgba(0, 0, 0, 0.15);
+  background: #764ba2; /* Solid color for performance */
+  box-shadow: 3px 0 14px rgba(102, 126, 234, 0.4);
+}
+
+/* Hover State - Attached (open) */
+.sidebarTab.attached:hover {
+  transform: translateY(-50%) translateZ(0) scale(1.05);
+  box-shadow: -4px 0 18px rgba(102, 126, 234, 0.5);
 }
 
 /* Active (Press) State */
 .sidebarTab:active {
-  transform: translateY(-50%) scale(0.95);
+  transform: translateY(-50%) translateZ(0) scale(0.92);
 }
 
 /* Tab Label */
@@ -147,17 +187,25 @@
   user-select: none;
 }
 
-/* Dark Mode */
-[data-theme="dark"] .sidebarTab {
-  background: linear-gradient(135deg, #a8edea 0%, #667eea 100%);
-  box-shadow: 2px 0 12px rgba(168, 237, 234, 0.3),
-              2px 0 4px rgba(0, 0, 0, 0.2);
+/* Dark Mode - Normal state */
+[data-theme="dark"] .sidebarTab:not(.attached) {
+  background: #60a5fa; /* Solid blue-400 for performance */
+  box-shadow: 2px 0 12px rgba(96, 165, 250, 0.35);
 }
 
-[data-theme="dark"] .sidebarTab:hover {
-  background: linear-gradient(135deg, #667eea 0%, #a8edea 100%);
-  box-shadow: 3px 0 16px rgba(168, 237, 234, 0.5),
-              3px 0 8px rgba(0, 0, 0, 0.3);
+[data-theme="dark"] .sidebarTab:not(.attached):hover {
+  background: #3b82f6; /* Solid blue-500 */
+  box-shadow: 3px 0 14px rgba(96, 165, 250, 0.45);
+}
+
+/* Dark Mode - Attached state */
+[data-theme="dark"] .sidebarTab.attached {
+  background: #3b82f6; /* Solid blue-500 */
+  box-shadow: -2px 0 16px rgba(96, 165, 250, 0.4);
+}
+
+[data-theme="dark"] .sidebarTab.attached:hover {
+  box-shadow: -4px 0 18px rgba(96, 165, 250, 0.55);
 }
 
 /* Animations */
@@ -209,20 +257,26 @@
 
 /* Small Screens - Adjust size */
 @media (max-width: 374px) {
-  .sidebarTab {
+  .sidebarTab:not(.attached) {
     width: 44px;
     height: 90px;
     font-size: 9px;
   }
 
-  .sidebarTab:hover {
+  .sidebarTab:not(.attached):hover {
     width: 48px;
+  }
+
+  .sidebarTab.attached {
+    left: calc(75vw - 44px);
+    width: 44px;
+    height: 44px;
   }
 }
 
 /* Landscape - Move to top */
 @media (max-width: 996px) and (orientation: landscape) {
-  .sidebarTab {
+  .sidebarTab:not(.attached) {
     top: 80px;
     left: 8px;
     transform: translateY(0);
@@ -233,13 +287,26 @@
     border-radius: 12px;
   }
 
-  .sidebarTab:hover {
+  .sidebarTab:not(.attached):hover {
     width: 88px;
     transform: translateY(0);
   }
 
+  .sidebarTab.attached {
+    top: 80px;
+    left: calc(85vw - 48px);
+    transform: translateY(0);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+  }
+
+  .sidebarTab.attached:hover {
+    transform: scale(1.05);
+  }
+
   .sidebarTab:active {
-    transform: scale(0.95);
+    transform: scale(0.92);
   }
 
   .tabLabel {
