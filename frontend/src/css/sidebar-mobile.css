@@ -3,6 +3,21 @@
  * Separate INDEX tab behavior from hamburger menu
  */
 
+/* CRITICAL: Move INDEX icon to sidebar edge when sidebar is open (Pure CSS solution) */
+@media (max-width: 996px) {
+  /* Detect when sidebar is open and move the INDEX icon */
+  body:has(.navbar-sidebar--show) button[data-sidebar-open] {
+    left: calc(75vw - 48px) !important;
+  }
+
+  /* Landscape mode */
+  @media (orientation: landscape) {
+    body:has(.navbar-sidebar--show) button[data-sidebar-open] {
+      left: calc(85vw - 48px) !important;
+    }
+  }
+}
+
 /* When INDEX tab triggers sidebar, hide navbar items to show only book chapters */
 body[data-index-triggered] .navbar-sidebar__items .navbar__item {
   display: none !important;

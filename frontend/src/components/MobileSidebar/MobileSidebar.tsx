@@ -50,7 +50,6 @@ export default function MobileSidebar() {
         const navbarSidebar = document.querySelector('.navbar-sidebar');
         const isOpen = navbarSidebar?.classList.contains('navbar-sidebar--show');
 
-        console.log('[MobileSidebar] Sidebar state:', isOpen ? 'OPEN' : 'CLOSED');
         setIsSidebarOpen(!!isOpen);
 
         if (!isOpen) {
@@ -116,12 +115,6 @@ export default function MobileSidebar() {
 
   // Only render on mobile
   if (!isMobile) return null;
-
-  console.log('[MobileSidebar] Rendering with state:', {
-    isSidebarOpen,
-    hasAttachedClass: isSidebarOpen,
-    className: `${styles.sidebarTab} ${isSidebarOpen ? styles.attached : ''}`
-  });
 
   return (
     <button
