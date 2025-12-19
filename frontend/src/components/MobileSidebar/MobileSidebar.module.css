@@ -27,7 +27,7 @@
   /* Transitions */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* Z-index - Below chatbot but above content */
+  /* Z-index - Below drawer/backdrop */
   z-index: 999;
 
   /* Layout - Vertical orientation */
@@ -45,6 +45,85 @@
 
   /* Animation - Slide in from left */
   animation: slideInFromLeft 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Backdrop Overlay */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  animation: fadeIn 0.25s ease;
+}
+
+/* Sidebar Drawer */
+.drawer {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 85%;
+  max-width: 320px;
+  background: var(--ifm-background-surface-color);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+  animation: slideInFromLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Drawer Header */
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  background: var(--ifm-color-emphasis-50);
+}
+
+.drawerTitle {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ifm-color-emphasis-900);
+}
+
+.closeButton {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  color: var(--ifm-color-emphasis-700);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.closeButton:hover {
+  background: var(--ifm-color-emphasis-200);
+  color: var(--ifm-color-emphasis-900);
+}
+
+.closeButton:active {
+  transform: scale(0.95);
+}
+
+/* Drawer Content */
+.drawerContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.sidebarContent {
+  /* Inherit Docusaurus sidebar styles */
 }
 
 /* Hover State */
@@ -81,7 +160,7 @@
               3px 0 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Slide-in Animation */
+/* Animations */
 @keyframes slideInFromLeft {
   from {
     opacity: 0;
@@ -91,6 +170,26 @@
     opacity: 1;
     transform: translateX(0) translateY(-50%);
   }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Dark Mode - Drawer */
+[data-theme="dark"] .drawer {
+  background: var(--ifm-background-surface-color);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .drawerHeader {
+  background: var(--ifm-color-emphasis-100);
+  border-bottom-color: var(--ifm-color-emphasis-300);
 }
 
 /* Desktop - Hide (>996px) */
